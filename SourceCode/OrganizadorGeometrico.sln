@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrganizadorGeometrico", "OrganizadorGeometrico\OrganizadorGeometrico.csproj", "{755056AA-A11C-4699-A67C-2E8A0DE549B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{755056AA-A11C-4699-A67C-2E8A0DE549B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{755056AA-A11C-4699-A67C-2E8A0DE549B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{755056AA-A11C-4699-A67C-2E8A0DE549B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{755056AA-A11C-4699-A67C-2E8A0DE549B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {906E72D7-673A-4CAC-BFB0-031D732E1DB5}
+	EndGlobalSection
+EndGlobal
