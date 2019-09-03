@@ -41,29 +41,34 @@
             this.creditosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.gpFigurasGeometricas = new System.Windows.Forms.GroupBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dgvArquivos = new System.Windows.Forms.DataGridView();
+            this.Arquivos = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnRemoverFigurasGeometricas = new System.Windows.Forms.Button();
             this.btnImportarFigurasGeometricas = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnRemoverPlanoGeometrico = new System.Windows.Forms.Button();
             this.btnImportarPlanoGeometrico = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtNomePlacaGravacao = new System.Windows.Forms.TextBox();
             this.Resultados = new System.Windows.Forms.GroupBox();
-            this.rtResultados = new System.Windows.Forms.RichTextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.label2 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rtResultados = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.gpFigurasGeometricas.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvArquivos)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.Resultados.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
@@ -79,7 +84,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1217, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1122, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -112,6 +117,7 @@
             this.iniciarOrganizadorAutomaticoToolStripMenuItem.Name = "iniciarOrganizadorAutomaticoToolStripMenuItem";
             this.iniciarOrganizadorAutomaticoToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.iniciarOrganizadorAutomaticoToolStripMenuItem.Text = "Iniciar Organizador Automatico";
+            this.iniciarOrganizadorAutomaticoToolStripMenuItem.Click += new System.EventHandler(this.IniciarOrganizadorAutomaticoToolStripMenuItem_Click);
             // 
             // configuracoesToolStripMenuItem
             // 
@@ -154,30 +160,41 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.Resultados);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
-            this.splitContainer1.Size = new System.Drawing.Size(1217, 644);
-            this.splitContainer1.SplitterDistance = 405;
+            this.splitContainer1.Size = new System.Drawing.Size(1122, 618);
+            this.splitContainer1.SplitterDistance = 373;
             this.splitContainer1.TabIndex = 2;
             // 
             // gpFigurasGeometricas
             // 
-            this.gpFigurasGeometricas.Controls.Add(this.dataGridView1);
+            this.gpFigurasGeometricas.Controls.Add(this.dgvArquivos);
             this.gpFigurasGeometricas.Controls.Add(this.btnRemoverFigurasGeometricas);
             this.gpFigurasGeometricas.Controls.Add(this.btnImportarFigurasGeometricas);
-            this.gpFigurasGeometricas.Enabled = false;
-            this.gpFigurasGeometricas.Location = new System.Drawing.Point(15, 153);
+            this.gpFigurasGeometricas.Dock = System.Windows.Forms.DockStyle.Top;
+            this.gpFigurasGeometricas.Location = new System.Drawing.Point(0, 138);
             this.gpFigurasGeometricas.Name = "gpFigurasGeometricas";
-            this.gpFigurasGeometricas.Size = new System.Drawing.Size(377, 479);
+            this.gpFigurasGeometricas.Size = new System.Drawing.Size(373, 479);
             this.gpFigurasGeometricas.TabIndex = 2;
             this.gpFigurasGeometricas.TabStop = false;
             this.gpFigurasGeometricas.Text = "Figuras Geometricas";
             // 
-            // dataGridView1
+            // dgvArquivos
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 22);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(368, 388);
-            this.dataGridView1.TabIndex = 6;
+            this.dgvArquivos.AllowUserToAddRows = false;
+            this.dgvArquivos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvArquivos.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Arquivos});
+            this.dgvArquivos.Location = new System.Drawing.Point(17, 29);
+            this.dgvArquivos.Name = "dgvArquivos";
+            this.dgvArquivos.ReadOnly = true;
+            this.dgvArquivos.Size = new System.Drawing.Size(343, 388);
+            this.dgvArquivos.TabIndex = 6;
+            // 
+            // Arquivos
+            // 
+            this.Arquivos.HeaderText = "Arquivos";
+            this.Arquivos.Name = "Arquivos";
+            this.Arquivos.ReadOnly = true;
+            this.Arquivos.Width = 300;
             // 
             // btnRemoverFigurasGeometricas
             // 
@@ -187,6 +204,7 @@
             this.btnRemoverFigurasGeometricas.TabIndex = 5;
             this.btnRemoverFigurasGeometricas.Text = "Remover";
             this.btnRemoverFigurasGeometricas.UseVisualStyleBackColor = true;
+            this.btnRemoverFigurasGeometricas.Click += new System.EventHandler(this.BtnRemoverFigurasGeometricas_Click);
             // 
             // btnImportarFigurasGeometricas
             // 
@@ -196,16 +214,18 @@
             this.btnImportarFigurasGeometricas.TabIndex = 4;
             this.btnImportarFigurasGeometricas.Text = "Importar";
             this.btnImportarFigurasGeometricas.UseVisualStyleBackColor = true;
+            this.btnImportarFigurasGeometricas.Click += new System.EventHandler(this.BtnImportarFigurasGeometricas_Click);
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.btnRemoverPlanoGeometrico);
             this.groupBox1.Controls.Add(this.btnImportarPlanoGeometrico);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 13);
+            this.groupBox1.Controls.Add(this.txtNomePlacaGravacao);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(380, 128);
+            this.groupBox1.Size = new System.Drawing.Size(373, 138);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Plano Geometrico";
@@ -213,7 +233,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 20);
+            this.label1.Location = new System.Drawing.Point(23, 20);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(89, 13);
             this.label1.TabIndex = 4;
@@ -221,9 +241,10 @@
             // 
             // btnRemoverPlanoGeometrico
             // 
-            this.btnRemoverPlanoGeometrico.Location = new System.Drawing.Point(155, 79);
+            this.btnRemoverPlanoGeometrico.Enabled = false;
+            this.btnRemoverPlanoGeometrico.Location = new System.Drawing.Point(191, 72);
             this.btnRemoverPlanoGeometrico.Name = "btnRemoverPlanoGeometrico";
-            this.btnRemoverPlanoGeometrico.Size = new System.Drawing.Size(93, 26);
+            this.btnRemoverPlanoGeometrico.Size = new System.Drawing.Size(164, 60);
             this.btnRemoverPlanoGeometrico.TabIndex = 3;
             this.btnRemoverPlanoGeometrico.Text = "Remover";
             this.btnRemoverPlanoGeometrico.UseVisualStyleBackColor = true;
@@ -231,67 +252,104 @@
             // 
             // btnImportarPlanoGeometrico
             // 
-            this.btnImportarPlanoGeometrico.Location = new System.Drawing.Point(39, 79);
+            this.btnImportarPlanoGeometrico.Location = new System.Drawing.Point(20, 72);
             this.btnImportarPlanoGeometrico.Name = "btnImportarPlanoGeometrico";
-            this.btnImportarPlanoGeometrico.Size = new System.Drawing.Size(93, 26);
+            this.btnImportarPlanoGeometrico.Size = new System.Drawing.Size(165, 60);
             this.btnImportarPlanoGeometrico.TabIndex = 2;
             this.btnImportarPlanoGeometrico.Text = "Importar";
             this.btnImportarPlanoGeometrico.UseVisualStyleBackColor = true;
             this.btnImportarPlanoGeometrico.Click += new System.EventHandler(this.BtnImportarPlanoGeometrico_Click);
             // 
-            // textBox1
+            // txtNomePlacaGravacao
             // 
-            this.textBox1.Location = new System.Drawing.Point(39, 36);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(209, 20);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "Plano1.DXF";
+            this.txtNomePlacaGravacao.BackColor = System.Drawing.Color.White;
+            this.txtNomePlacaGravacao.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtNomePlacaGravacao.Location = new System.Drawing.Point(20, 36);
+            this.txtNomePlacaGravacao.Name = "txtNomePlacaGravacao";
+            this.txtNomePlacaGravacao.ReadOnly = true;
+            this.txtNomePlacaGravacao.Size = new System.Drawing.Size(335, 23);
+            this.txtNomePlacaGravacao.TabIndex = 1;
             // 
             // Resultados
             // 
-            this.Resultados.Controls.Add(this.rtResultados);
-            this.Resultados.Location = new System.Drawing.Point(16, 484);
+            this.Resultados.Controls.Add(this.panel1);
+            this.Resultados.Controls.Add(this.label2);
+            this.Resultados.Controls.Add(this.progressBar1);
+            this.Resultados.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.Resultados.Location = new System.Drawing.Point(0, 446);
             this.Resultados.Name = "Resultados";
-            this.Resultados.Size = new System.Drawing.Size(780, 141);
+            this.Resultados.Size = new System.Drawing.Size(745, 172);
             this.Resultados.TabIndex = 1;
             this.Resultados.TabStop = false;
             this.Resultados.Text = "Resultados";
             // 
-            // rtResultados
-            // 
-            this.rtResultados.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rtResultados.Location = new System.Drawing.Point(3, 16);
-            this.rtResultados.Name = "rtResultados";
-            this.rtResultados.ReadOnly = true;
-            this.rtResultados.Size = new System.Drawing.Size(774, 122);
-            this.rtResultados.TabIndex = 0;
-            this.rtResultados.Text = "";
-            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.pictureBox1);
-            this.groupBox3.Location = new System.Drawing.Point(15, 14);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(781, 454);
+            this.groupBox3.Size = new System.Drawing.Size(745, 618);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Visao Grafica";
             // 
             // pictureBox1
             // 
+            this.pictureBox1.BackColor = System.Drawing.Color.White;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(3, 16);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(761, 416);
-            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.Size = new System.Drawing.Size(739, 599);
+            this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.progressBar1.Location = new System.Drawing.Point(3, 148);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(739, 21);
+            this.progressBar1.TabIndex = 2;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.label2.Location = new System.Drawing.Point(3, 135);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(57, 13);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Progresso:";
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.rtResultados);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 16);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(739, 119);
+            this.panel1.TabIndex = 4;
+            // 
+            // rtResultados
+            // 
+            this.rtResultados.BackColor = System.Drawing.Color.White;
+            this.rtResultados.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtResultados.Location = new System.Drawing.Point(0, 0);
+            this.rtResultados.Name = "rtResultados";
+            this.rtResultados.ReadOnly = true;
+            this.rtResultados.Size = new System.Drawing.Size(739, 119);
+            this.rtResultados.TabIndex = 1;
+            this.rtResultados.Text = "";
             // 
             // Form_Principal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1217, 668);
+            this.ClientSize = new System.Drawing.Size(1122, 642);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form_Principal";
             this.Text = "Organizador Automatico";
@@ -302,12 +360,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.gpFigurasGeometricas.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvArquivos)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.Resultados.ResumeLayout(false);
+            this.Resultados.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -330,15 +390,19 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnRemoverPlanoGeometrico;
         private System.Windows.Forms.Button btnImportarPlanoGeometrico;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtNomePlacaGravacao;
         private System.Windows.Forms.Button btnRemoverFigurasGeometricas;
         private System.Windows.Forms.Button btnImportarFigurasGeometricas;
         private System.Windows.Forms.GroupBox Resultados;
-        private System.Windows.Forms.RichTextBox rtResultados;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ToolStripMenuItem exportarDXFToolStripMenuItem;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dgvArquivos;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Arquivos;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.RichTextBox rtResultados;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 
