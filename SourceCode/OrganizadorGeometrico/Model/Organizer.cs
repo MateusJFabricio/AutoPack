@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,28 +10,23 @@ namespace OrganizadorGeometrico.Model
     class Organizer
     {
         DXFItem PlacaCalibracao;
-        List<DXFItem> FigurasGeometricas;
-
-        public void Iniciar()
+        List<DXFItem> FigurasGeometricas = new List<DXFItem>();
+           
+        public void Exportar(string pathDestino)
         {
-            ValidarDados();
-
 
         }
 
-        public void AdicionarPlacaCalibracao(string path)
+        public void IniciarOrganizador(DXFItem placaCalibracao, List<DXFItem> figurasGeometricas)
         {
-            PlacaCalibracao = new DXFItem(path);
+            this.PlacaCalibracao = placaCalibracao;
+            this.FigurasGeometricas = figurasGeometricas;
         }
 
-        public void AdicionarFiguraGeometrica(string path)
+        public Bitmap BitmapResultado()
         {
-            FigurasGeometricas.Add(new DXFItem(path));
+            return new Bitmap(100, 100);
         }
 
-        private void ValidarDados()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

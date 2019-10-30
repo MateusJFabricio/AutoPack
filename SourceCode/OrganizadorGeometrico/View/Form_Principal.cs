@@ -1,6 +1,7 @@
 ﻿using OrganizadorGeometrico.Controller;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -25,6 +26,9 @@ namespace OrganizadorGeometrico
                 diretorioPlacaGravacao = arquivo[0];
                 string nomeComExtensao = Path.GetFileName(arquivo[0]);
                 txtNomePlacaGravacao.Text = nomeComExtensao.Substring(0, nomeComExtensao.ToUpper().IndexOf(".DXF"));
+                Bitmap bm = control.AdicionarPlacaGravacao(diretorioPlacaGravacao);
+                pbVisaoGrafica.BackgroundImage = bm;
+                pbVisaoGrafica.Refresh();
 
                 //Desabilita o botao de importar
                 btnImportarPlanoGeometrico.Enabled = false;
@@ -49,6 +53,7 @@ namespace OrganizadorGeometrico
             foreach (var item in AbrirDXF(true))
             {
                 dgvArquivos.Rows.Add(NomeArquivo(item));
+                control.AdicionarFiguraGeometrica(item);
             }
         }
 
@@ -110,7 +115,7 @@ namespace OrganizadorGeometrico
 
         private void IniciarOrganizadorAutomaticoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            control.IniciarOrganizador();
         }
     }
 }

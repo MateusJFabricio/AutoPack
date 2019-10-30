@@ -50,13 +50,13 @@
             this.btnRemoverPlanoGeometrico = new System.Windows.Forms.Button();
             this.btnImportarPlanoGeometrico = new System.Windows.Forms.Button();
             this.txtNomePlacaGravacao = new System.Windows.Forms.TextBox();
-            this.Resultados = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.label2 = new System.Windows.Forms.Label();
+            this.pbVisaoGrafica = new System.Windows.Forms.PictureBox();
+            this.Resultados = new System.Windows.Forms.GroupBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.rtResultados = new System.Windows.Forms.RichTextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -65,9 +65,9 @@
             this.gpFigurasGeometricas.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvArquivos)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.Resultados.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbVisaoGrafica)).BeginInit();
+            this.Resultados.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -158,8 +158,8 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.Resultados);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
+            this.splitContainer1.Panel2.Controls.Add(this.Resultados);
             this.splitContainer1.Size = new System.Drawing.Size(1122, 618);
             this.splitContainer1.SplitterDistance = 373;
             this.splitContainer1.TabIndex = 2;
@@ -270,6 +270,28 @@
             this.txtNomePlacaGravacao.Size = new System.Drawing.Size(335, 23);
             this.txtNomePlacaGravacao.TabIndex = 1;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.pbVisaoGrafica);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox3.Location = new System.Drawing.Point(0, 0);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(745, 446);
+            this.groupBox3.TabIndex = 2;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Visao Grafica";
+            // 
+            // pbVisaoGrafica
+            // 
+            this.pbVisaoGrafica.BackColor = System.Drawing.Color.Silver;
+            this.pbVisaoGrafica.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.pbVisaoGrafica.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbVisaoGrafica.Location = new System.Drawing.Point(3, 16);
+            this.pbVisaoGrafica.Name = "pbVisaoGrafica";
+            this.pbVisaoGrafica.Size = new System.Drawing.Size(739, 427);
+            this.pbVisaoGrafica.TabIndex = 2;
+            this.pbVisaoGrafica.TabStop = false;
+            // 
             // Resultados
             // 
             this.Resultados.Controls.Add(this.panel1);
@@ -282,45 +304,6 @@
             this.Resultados.TabIndex = 1;
             this.Resultados.TabStop = false;
             this.Resultados.Text = "Resultados";
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.pictureBox1);
-            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox3.Location = new System.Drawing.Point(0, 0);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(745, 618);
-            this.groupBox3.TabIndex = 0;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Visao Grafica";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.Color.White;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 16);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(739, 599);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(3, 148);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(739, 21);
-            this.progressBar1.TabIndex = 2;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.label2.Location = new System.Drawing.Point(3, 135);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(57, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Progresso:";
             // 
             // panel1
             // 
@@ -341,6 +324,24 @@
             this.rtResultados.Size = new System.Drawing.Size(739, 119);
             this.rtResultados.TabIndex = 1;
             this.rtResultados.Text = "";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.label2.Location = new System.Drawing.Point(3, 135);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(57, 13);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Progresso:";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.progressBar1.Location = new System.Drawing.Point(3, 148);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(739, 21);
+            this.progressBar1.TabIndex = 2;
             // 
             // Form_Principal
             // 
@@ -363,10 +364,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvArquivos)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbVisaoGrafica)).EndInit();
             this.Resultados.ResumeLayout(false);
             this.Resultados.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -394,15 +395,15 @@
         private System.Windows.Forms.Button btnRemoverFigurasGeometricas;
         private System.Windows.Forms.Button btnImportarFigurasGeometricas;
         private System.Windows.Forms.GroupBox Resultados;
-        private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ToolStripMenuItem exportarDXFToolStripMenuItem;
         private System.Windows.Forms.DataGridView dgvArquivos;
         private System.Windows.Forms.DataGridViewTextBoxColumn Arquivos;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RichTextBox rtResultados;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.PictureBox pbVisaoGrafica;
     }
 }
 

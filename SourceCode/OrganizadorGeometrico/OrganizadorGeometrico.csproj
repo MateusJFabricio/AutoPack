@@ -34,7 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="netDxf, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\netDXF.2.2.0.1\lib\net45\netDxf.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\netDxf\netDxf\bin\Debug\netDxf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,7 +54,6 @@
     <Compile Include="Controller\DXFController.cs" />
     <Compile Include="Model\DXFItem.cs" />
     <Compile Include="Model\Organizer.cs" />
-    <Compile Include="Model\Validacoes.cs" />
     <Compile Include="View\Form_Principal.cs">
       <SubType>Form</SubType>
     </Compile>
