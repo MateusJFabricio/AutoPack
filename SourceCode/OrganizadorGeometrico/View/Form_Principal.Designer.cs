@@ -52,6 +52,9 @@
             this.txtNomePlacaGravacao = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.pbVisaoGrafica = new System.Windows.Forms.PictureBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.btnMover = new System.Windows.Forms.Button();
+            this.btnZoom = new System.Windows.Forms.Button();
             this.Resultados = new System.Windows.Forms.GroupBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.rtResultados = new System.Windows.Forms.RichTextBox();
@@ -67,6 +70,7 @@
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVisaoGrafica)).BeginInit();
+            this.panel2.SuspendLayout();
             this.Resultados.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -273,6 +277,7 @@
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.pbVisaoGrafica);
+            this.groupBox3.Controls.Add(this.panel2);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
@@ -283,14 +288,51 @@
             // 
             // pbVisaoGrafica
             // 
-            this.pbVisaoGrafica.BackColor = System.Drawing.Color.Silver;
+            this.pbVisaoGrafica.BackColor = System.Drawing.Color.White;
             this.pbVisaoGrafica.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.pbVisaoGrafica.Cursor = System.Windows.Forms.Cursors.Default;
             this.pbVisaoGrafica.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbVisaoGrafica.Location = new System.Drawing.Point(3, 16);
+            this.pbVisaoGrafica.Location = new System.Drawing.Point(3, 39);
             this.pbVisaoGrafica.Name = "pbVisaoGrafica";
-            this.pbVisaoGrafica.Size = new System.Drawing.Size(739, 427);
-            this.pbVisaoGrafica.TabIndex = 2;
+            this.pbVisaoGrafica.Size = new System.Drawing.Size(739, 404);
+            this.pbVisaoGrafica.TabIndex = 7;
             this.pbVisaoGrafica.TabStop = false;
+            this.pbVisaoGrafica.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pbVisaoGrafica_MouseDown);
+            this.pbVisaoGrafica.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbVisaoGrafica_MouseMove);
+            this.pbVisaoGrafica.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbVisaoGrafica_MouseUp);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.btnMover);
+            this.panel2.Controls.Add(this.btnZoom);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(3, 16);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(739, 23);
+            this.panel2.TabIndex = 6;
+            // 
+            // btnMover
+            // 
+            this.btnMover.BackColor = System.Drawing.Color.Lime;
+            this.btnMover.Location = new System.Drawing.Point(580, 0);
+            this.btnMover.Name = "btnMover";
+            this.btnMover.Size = new System.Drawing.Size(75, 23);
+            this.btnMover.TabIndex = 6;
+            this.btnMover.Text = "Mover";
+            this.btnMover.UseVisualStyleBackColor = true;
+            this.btnMover.Click += new System.EventHandler(this.btnMover_Click);
+            // 
+            // btnZoom
+            // 
+            this.btnZoom.BackColor = System.Drawing.Color.Lime;
+            this.btnZoom.ForeColor = System.Drawing.Color.Black;
+            this.btnZoom.Location = new System.Drawing.Point(661, 0);
+            this.btnZoom.Name = "btnZoom";
+            this.btnZoom.Size = new System.Drawing.Size(75, 23);
+            this.btnZoom.TabIndex = 5;
+            this.btnZoom.Text = "Zoom";
+            this.btnZoom.UseVisualStyleBackColor = true;
+            this.btnZoom.Click += new System.EventHandler(this.btnZoom_Click);
             // 
             // Resultados
             // 
@@ -366,6 +408,7 @@
             this.groupBox1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbVisaoGrafica)).EndInit();
+            this.panel2.ResumeLayout(false);
             this.Resultados.ResumeLayout(false);
             this.Resultados.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -404,6 +447,9 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.PictureBox pbVisaoGrafica;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnMover;
+        private System.Windows.Forms.Button btnZoom;
     }
 }
 
