@@ -42,10 +42,24 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.gpFigurasGeometricas = new System.Windows.Forms.GroupBox();
             this.dgvArquivos = new System.Windows.Forms.DataGridView();
-            this.Arquivos = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Nome = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Ordem = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Area = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Largura = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Altura = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbAltura = new System.Windows.Forms.RadioButton();
+            this.rbLargura = new System.Windows.Forms.RadioButton();
+            this.rbCustomizada = new System.Windows.Forms.RadioButton();
+            this.rbArea = new System.Windows.Forms.RadioButton();
+            this.btnOrdenar = new System.Windows.Forms.Button();
+            this.btnVisualizar = new System.Windows.Forms.Button();
             this.btnRemoverFigurasGeometricas = new System.Windows.Forms.Button();
             this.btnImportarFigurasGeometricas = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnVisualizarPlanoGeometrico = new System.Windows.Forms.Button();
+            this.lblInformacaoPlanoGeometrico = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.btnRemoverPlanoGeometrico = new System.Windows.Forms.Button();
             this.btnImportarPlanoGeometrico = new System.Windows.Forms.Button();
@@ -60,6 +74,7 @@
             this.rtResultados = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.timerResultados = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -67,6 +82,7 @@
             this.splitContainer1.SuspendLayout();
             this.gpFigurasGeometricas.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvArquivos)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVisaoGrafica)).BeginInit();
@@ -88,7 +104,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1122, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1323, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -134,6 +150,7 @@
             this.exportarDXFToolStripMenuItem.Name = "exportarDXFToolStripMenuItem";
             this.exportarDXFToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.exportarDXFToolStripMenuItem.Text = "Exportar DXF";
+            this.exportarDXFToolStripMenuItem.Click += new System.EventHandler(this.exportarDXFToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -164,19 +181,21 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
             this.splitContainer1.Panel2.Controls.Add(this.Resultados);
-            this.splitContainer1.Size = new System.Drawing.Size(1122, 618);
-            this.splitContainer1.SplitterDistance = 373;
+            this.splitContainer1.Size = new System.Drawing.Size(1323, 726);
+            this.splitContainer1.SplitterDistance = 707;
             this.splitContainer1.TabIndex = 2;
             // 
             // gpFigurasGeometricas
             // 
             this.gpFigurasGeometricas.Controls.Add(this.dgvArquivos);
+            this.gpFigurasGeometricas.Controls.Add(this.groupBox2);
+            this.gpFigurasGeometricas.Controls.Add(this.btnVisualizar);
             this.gpFigurasGeometricas.Controls.Add(this.btnRemoverFigurasGeometricas);
             this.gpFigurasGeometricas.Controls.Add(this.btnImportarFigurasGeometricas);
             this.gpFigurasGeometricas.Dock = System.Windows.Forms.DockStyle.Top;
             this.gpFigurasGeometricas.Location = new System.Drawing.Point(0, 138);
             this.gpFigurasGeometricas.Name = "gpFigurasGeometricas";
-            this.gpFigurasGeometricas.Size = new System.Drawing.Size(373, 479);
+            this.gpFigurasGeometricas.Size = new System.Drawing.Size(707, 478);
             this.gpFigurasGeometricas.TabIndex = 2;
             this.gpFigurasGeometricas.TabStop = false;
             this.gpFigurasGeometricas.Text = "Figuras Geometricas";
@@ -186,23 +205,140 @@
             this.dgvArquivos.AllowUserToAddRows = false;
             this.dgvArquivos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvArquivos.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Arquivos});
-            this.dgvArquivos.Location = new System.Drawing.Point(17, 29);
+            this.Id,
+            this.Nome,
+            this.Ordem,
+            this.Area,
+            this.Largura,
+            this.Altura});
+            this.dgvArquivos.Dock = System.Windows.Forms.DockStyle.Top;
+            this.dgvArquivos.Location = new System.Drawing.Point(3, 79);
             this.dgvArquivos.Name = "dgvArquivos";
-            this.dgvArquivos.ReadOnly = true;
-            this.dgvArquivos.Size = new System.Drawing.Size(343, 388);
-            this.dgvArquivos.TabIndex = 6;
+            this.dgvArquivos.Size = new System.Drawing.Size(701, 345);
+            this.dgvArquivos.TabIndex = 11;
+            this.dgvArquivos.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvArquivos_CellEndEdit);
             // 
-            // Arquivos
+            // Id
             // 
-            this.Arquivos.HeaderText = "Arquivos";
-            this.Arquivos.Name = "Arquivos";
-            this.Arquivos.ReadOnly = true;
-            this.Arquivos.Width = 300;
+            this.Id.HeaderText = "ID";
+            this.Id.Name = "Id";
+            this.Id.ReadOnly = true;
+            // 
+            // Nome
+            // 
+            this.Nome.HeaderText = "Nome";
+            this.Nome.Name = "Nome";
+            this.Nome.ReadOnly = true;
+            this.Nome.Width = 200;
+            // 
+            // Ordem
+            // 
+            this.Ordem.HeaderText = "Ordem";
+            this.Ordem.Name = "Ordem";
+            this.Ordem.Width = 50;
+            // 
+            // Area
+            // 
+            this.Area.HeaderText = "Area (mm2)";
+            this.Area.Name = "Area";
+            this.Area.ReadOnly = true;
+            this.Area.Width = 50;
+            // 
+            // Largura
+            // 
+            this.Largura.HeaderText = "Largura (mm)";
+            this.Largura.Name = "Largura";
+            this.Largura.ReadOnly = true;
+            this.Largura.Width = 50;
+            // 
+            // Altura
+            // 
+            this.Altura.FillWeight = 80F;
+            this.Altura.HeaderText = "Altura (mm)";
+            this.Altura.Name = "Altura";
+            this.Altura.ReadOnly = true;
+            this.Altura.Width = 80;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.rbAltura);
+            this.groupBox2.Controls.Add(this.rbLargura);
+            this.groupBox2.Controls.Add(this.rbCustomizada);
+            this.groupBox2.Controls.Add(this.rbArea);
+            this.groupBox2.Controls.Add(this.btnOrdenar);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox2.Location = new System.Drawing.Point(3, 16);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(701, 63);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Ordem da disposicao das figuras no plano geometrico";
+            // 
+            // rbAltura
+            // 
+            this.rbAltura.AutoSize = true;
+            this.rbAltura.Location = new System.Drawing.Point(97, 34);
+            this.rbAltura.Name = "rbAltura";
+            this.rbAltura.Size = new System.Drawing.Size(52, 17);
+            this.rbAltura.TabIndex = 13;
+            this.rbAltura.Text = "Altura";
+            this.rbAltura.UseVisualStyleBackColor = true;
+            // 
+            // rbLargura
+            // 
+            this.rbLargura.AutoSize = true;
+            this.rbLargura.Location = new System.Drawing.Point(97, 17);
+            this.rbLargura.Name = "rbLargura";
+            this.rbLargura.Size = new System.Drawing.Size(61, 17);
+            this.rbLargura.TabIndex = 12;
+            this.rbLargura.Text = "Largura";
+            this.rbLargura.UseVisualStyleBackColor = true;
+            // 
+            // rbCustomizada
+            // 
+            this.rbCustomizada.AutoSize = true;
+            this.rbCustomizada.Location = new System.Drawing.Point(5, 34);
+            this.rbCustomizada.Name = "rbCustomizada";
+            this.rbCustomizada.Size = new System.Drawing.Size(85, 17);
+            this.rbCustomizada.TabIndex = 11;
+            this.rbCustomizada.Text = "Customizada";
+            this.rbCustomizada.UseVisualStyleBackColor = true;
+            // 
+            // rbArea
+            // 
+            this.rbArea.AutoSize = true;
+            this.rbArea.Checked = true;
+            this.rbArea.Location = new System.Drawing.Point(6, 17);
+            this.rbArea.Name = "rbArea";
+            this.rbArea.Size = new System.Drawing.Size(47, 17);
+            this.rbArea.TabIndex = 10;
+            this.rbArea.TabStop = true;
+            this.rbArea.Text = "Area";
+            this.rbArea.UseVisualStyleBackColor = true;
+            // 
+            // btnOrdenar
+            // 
+            this.btnOrdenar.Location = new System.Drawing.Point(188, 19);
+            this.btnOrdenar.Name = "btnOrdenar";
+            this.btnOrdenar.Size = new System.Drawing.Size(83, 31);
+            this.btnOrdenar.TabIndex = 9;
+            this.btnOrdenar.Text = "Ordenar";
+            this.btnOrdenar.UseVisualStyleBackColor = true;
+            this.btnOrdenar.Click += new System.EventHandler(this.btnOrdenar_Click);
+            // 
+            // btnVisualizar
+            // 
+            this.btnVisualizar.Location = new System.Drawing.Point(246, 430);
+            this.btnVisualizar.Name = "btnVisualizar";
+            this.btnVisualizar.Size = new System.Drawing.Size(122, 40);
+            this.btnVisualizar.TabIndex = 8;
+            this.btnVisualizar.Text = "Visualizar";
+            this.btnVisualizar.UseVisualStyleBackColor = true;
+            this.btnVisualizar.Click += new System.EventHandler(this.btnVisualizar_Click);
             // 
             // btnRemoverFigurasGeometricas
             // 
-            this.btnRemoverFigurasGeometricas.Location = new System.Drawing.Point(171, 433);
+            this.btnRemoverFigurasGeometricas.Location = new System.Drawing.Point(120, 430);
             this.btnRemoverFigurasGeometricas.Name = "btnRemoverFigurasGeometricas";
             this.btnRemoverFigurasGeometricas.Size = new System.Drawing.Size(122, 40);
             this.btnRemoverFigurasGeometricas.TabIndex = 5;
@@ -212,7 +348,7 @@
             // 
             // btnImportarFigurasGeometricas
             // 
-            this.btnImportarFigurasGeometricas.Location = new System.Drawing.Point(33, 433);
+            this.btnImportarFigurasGeometricas.Location = new System.Drawing.Point(6, 430);
             this.btnImportarFigurasGeometricas.Name = "btnImportarFigurasGeometricas";
             this.btnImportarFigurasGeometricas.Size = new System.Drawing.Size(110, 40);
             this.btnImportarFigurasGeometricas.TabIndex = 4;
@@ -222,6 +358,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnVisualizarPlanoGeometrico);
+            this.groupBox1.Controls.Add(this.lblInformacaoPlanoGeometrico);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.btnRemoverPlanoGeometrico);
             this.groupBox1.Controls.Add(this.btnImportarPlanoGeometrico);
@@ -229,10 +367,30 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(373, 138);
+            this.groupBox1.Size = new System.Drawing.Size(707, 138);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Plano Geometrico";
+            // 
+            // btnVisualizarPlanoGeometrico
+            // 
+            this.btnVisualizarPlanoGeometrico.Enabled = false;
+            this.btnVisualizarPlanoGeometrico.Location = new System.Drawing.Point(230, 89);
+            this.btnVisualizarPlanoGeometrico.Name = "btnVisualizarPlanoGeometrico";
+            this.btnVisualizarPlanoGeometrico.Size = new System.Drawing.Size(125, 43);
+            this.btnVisualizarPlanoGeometrico.TabIndex = 6;
+            this.btnVisualizarPlanoGeometrico.Text = "Visualizar";
+            this.btnVisualizarPlanoGeometrico.UseVisualStyleBackColor = true;
+            this.btnVisualizarPlanoGeometrico.Click += new System.EventHandler(this.btnVisualizarPlanoGeometrico_Click);
+            // 
+            // lblInformacaoPlanoGeometrico
+            // 
+            this.lblInformacaoPlanoGeometrico.AutoSize = true;
+            this.lblInformacaoPlanoGeometrico.Location = new System.Drawing.Point(23, 62);
+            this.lblInformacaoPlanoGeometrico.Name = "lblInformacaoPlanoGeometrico";
+            this.lblInformacaoPlanoGeometrico.Size = new System.Drawing.Size(127, 13);
+            this.lblInformacaoPlanoGeometrico.TabIndex = 5;
+            this.lblInformacaoPlanoGeometrico.Text = "Nenhum plano carregado";
             // 
             // label1
             // 
@@ -246,9 +404,9 @@
             // btnRemoverPlanoGeometrico
             // 
             this.btnRemoverPlanoGeometrico.Enabled = false;
-            this.btnRemoverPlanoGeometrico.Location = new System.Drawing.Point(191, 72);
+            this.btnRemoverPlanoGeometrico.Location = new System.Drawing.Point(118, 89);
             this.btnRemoverPlanoGeometrico.Name = "btnRemoverPlanoGeometrico";
-            this.btnRemoverPlanoGeometrico.Size = new System.Drawing.Size(164, 60);
+            this.btnRemoverPlanoGeometrico.Size = new System.Drawing.Size(106, 43);
             this.btnRemoverPlanoGeometrico.TabIndex = 3;
             this.btnRemoverPlanoGeometrico.Text = "Remover";
             this.btnRemoverPlanoGeometrico.UseVisualStyleBackColor = true;
@@ -256,9 +414,9 @@
             // 
             // btnImportarPlanoGeometrico
             // 
-            this.btnImportarPlanoGeometrico.Location = new System.Drawing.Point(20, 72);
+            this.btnImportarPlanoGeometrico.Location = new System.Drawing.Point(20, 89);
             this.btnImportarPlanoGeometrico.Name = "btnImportarPlanoGeometrico";
-            this.btnImportarPlanoGeometrico.Size = new System.Drawing.Size(165, 60);
+            this.btnImportarPlanoGeometrico.Size = new System.Drawing.Size(92, 43);
             this.btnImportarPlanoGeometrico.TabIndex = 2;
             this.btnImportarPlanoGeometrico.Text = "Importar";
             this.btnImportarPlanoGeometrico.UseVisualStyleBackColor = true;
@@ -281,7 +439,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(745, 446);
+            this.groupBox3.Size = new System.Drawing.Size(612, 554);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Visao Grafica";
@@ -294,7 +452,7 @@
             this.pbVisaoGrafica.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pbVisaoGrafica.Location = new System.Drawing.Point(3, 39);
             this.pbVisaoGrafica.Name = "pbVisaoGrafica";
-            this.pbVisaoGrafica.Size = new System.Drawing.Size(739, 404);
+            this.pbVisaoGrafica.Size = new System.Drawing.Size(606, 512);
             this.pbVisaoGrafica.TabIndex = 7;
             this.pbVisaoGrafica.TabStop = false;
             this.pbVisaoGrafica.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pbVisaoGrafica_MouseDown);
@@ -308,13 +466,13 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(3, 16);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(739, 23);
+            this.panel2.Size = new System.Drawing.Size(606, 23);
             this.panel2.TabIndex = 6;
             // 
             // btnMover
             // 
             this.btnMover.BackColor = System.Drawing.Color.Lime;
-            this.btnMover.Location = new System.Drawing.Point(580, 0);
+            this.btnMover.Location = new System.Drawing.Point(3, 0);
             this.btnMover.Name = "btnMover";
             this.btnMover.Size = new System.Drawing.Size(75, 23);
             this.btnMover.TabIndex = 6;
@@ -326,7 +484,7 @@
             // 
             this.btnZoom.BackColor = System.Drawing.Color.Lime;
             this.btnZoom.ForeColor = System.Drawing.Color.Black;
-            this.btnZoom.Location = new System.Drawing.Point(661, 0);
+            this.btnZoom.Location = new System.Drawing.Point(84, -1);
             this.btnZoom.Name = "btnZoom";
             this.btnZoom.Size = new System.Drawing.Size(75, 23);
             this.btnZoom.TabIndex = 5;
@@ -340,9 +498,9 @@
             this.Resultados.Controls.Add(this.label2);
             this.Resultados.Controls.Add(this.progressBar1);
             this.Resultados.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.Resultados.Location = new System.Drawing.Point(0, 446);
+            this.Resultados.Location = new System.Drawing.Point(0, 554);
             this.Resultados.Name = "Resultados";
-            this.Resultados.Size = new System.Drawing.Size(745, 172);
+            this.Resultados.Size = new System.Drawing.Size(612, 172);
             this.Resultados.TabIndex = 1;
             this.Resultados.TabStop = false;
             this.Resultados.Text = "Resultados";
@@ -353,7 +511,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 16);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(739, 119);
+            this.panel1.Size = new System.Drawing.Size(606, 119);
             this.panel1.TabIndex = 4;
             // 
             // rtResultados
@@ -363,7 +521,7 @@
             this.rtResultados.Location = new System.Drawing.Point(0, 0);
             this.rtResultados.Name = "rtResultados";
             this.rtResultados.ReadOnly = true;
-            this.rtResultados.Size = new System.Drawing.Size(739, 119);
+            this.rtResultados.Size = new System.Drawing.Size(606, 119);
             this.rtResultados.TabIndex = 1;
             this.rtResultados.Text = "";
             // 
@@ -382,20 +540,28 @@
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.progressBar1.Location = new System.Drawing.Point(3, 148);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(739, 21);
+            this.progressBar1.Size = new System.Drawing.Size(606, 21);
             this.progressBar1.TabIndex = 2;
+            // 
+            // timerResultados
+            // 
+            this.timerResultados.Enabled = true;
+            this.timerResultados.Interval = 1000;
+            this.timerResultados.Tick += new System.EventHandler(this.timerResultados_Tick);
             // 
             // Form_Principal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1122, 642);
+            this.ClientSize = new System.Drawing.Size(1323, 750);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form_Principal";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Organizador Automatico";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -404,6 +570,8 @@
             this.splitContainer1.ResumeLayout(false);
             this.gpFigurasGeometricas.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvArquivos)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -439,8 +607,6 @@
         private System.Windows.Forms.Button btnImportarFigurasGeometricas;
         private System.Windows.Forms.GroupBox Resultados;
         private System.Windows.Forms.ToolStripMenuItem exportarDXFToolStripMenuItem;
-        private System.Windows.Forms.DataGridView dgvArquivos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Arquivos;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RichTextBox rtResultados;
         private System.Windows.Forms.Label label2;
@@ -450,6 +616,23 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnMover;
         private System.Windows.Forms.Button btnZoom;
+        private System.Windows.Forms.Label lblInformacaoPlanoGeometrico;
+        private System.Windows.Forms.Button btnVisualizarPlanoGeometrico;
+        private System.Windows.Forms.Button btnVisualizar;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton rbAltura;
+        private System.Windows.Forms.RadioButton rbLargura;
+        private System.Windows.Forms.RadioButton rbCustomizada;
+        private System.Windows.Forms.RadioButton rbArea;
+        private System.Windows.Forms.Button btnOrdenar;
+        private System.Windows.Forms.DataGridView dgvArquivos;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Nome;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Ordem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Area;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Largura;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Altura;
+        private System.Windows.Forms.Timer timerResultados;
     }
 }
 

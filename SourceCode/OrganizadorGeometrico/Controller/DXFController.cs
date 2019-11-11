@@ -11,8 +11,10 @@ namespace OrganizadorGeometrico.Controller
         public DXFItem placaGravacao;
         public DXFItem figuraGeometricaAtual;
         public List<DXFItem> figurasGeometricas = new List<DXFItem>();
+        private int idFiguraGeometrica = 0;
+        public Queue<string> mensagens = new Queue<string>();
 
-        public void IniciarOrganizador()
+        public Bitmap IniciarOrganizador()
         {
             if (placaGravacao == null)
                 throw new Exception("Atencao! Nao há placa de gravacao!");
@@ -20,19 +22,43 @@ namespace OrganizadorGeometrico.Controller
             if (figurasGeometricas.Count == 0)
                 throw new Exception("Atencao! Nao há figuras geometricas para organizar!");
 
+            mensagens.Enqueue("Iniciado o organizador");
+
             organizador.IniciarOrganizador(placaGravacao, figurasGeometricas);
+
+            foreach (var log in organizador.log)
+            {
+                mensagens.Enqueue(log);
+            }
+
+
+
+            if (organizador.sucessoOrganizador)
+                mensagens.Enqueue("Organizador concluido com sucesso");
+            else
+               mensagens.Enqueue("Organizador concluido sem sucesso");
+            
+
+            return organizador.BitmapResultado();
         }
 
-        public Bitmap AdicionarPlacaGravacao(string path, int largura, int altura)
+        public Bitmap AdicionarPlacaGravacao(string path)
         {
-            DXFItem placaGravacao = new DXFItem(path, largura, altura);
+            placaGravacao = new DXFItem();
+            placaGravacao.InicializarDeArquivo(path, 0, true);
+
+            //Valida se a figura geometrica esta aberta
+            if (!placaGravacao.figuraFechada)
+                throw new Exception("A figura geometrica deve fechada. Ha pontos abertos na figuras geometrica selecionada");
+
             figuraGeometricaAtual = placaGravacao;
             return placaGravacao.GetBitmap();
         }
 
-        public Bitmap AdicionarFiguraGeometrica(string path, int largura, int altura)
+        public Bitmap AdicionarFiguraGeometrica(string path)
         {
-            DXFItem item = new DXFItem(path, largura, altura);
+            DXFItem item = new DXFItem();
+            item.InicializarDeArquivo(path, ++idFiguraGeometrica);
             figurasGeometricas.Add(item);
             figuraGeometricaAtual = item;
             return item.GetBitmap();
@@ -44,12 +70,15 @@ namespace OrganizadorGeometrico.Controller
             figuraGeometricaAtual = null;
         }
 
-        public void RemoverFiguraGeometrica(string path)
+        public void RemoverFiguraGeometrica(int id)
         {
             foreach (var fg in figurasGeometricas)
             {
-                if (fg.path == path)
+                if (fg.id == id)
+                {
                     figurasGeometricas.Remove(fg);
+                    break;
+                }
             }
             figuraGeometricaAtual = null;
         }
@@ -64,8 +93,51 @@ namespace OrganizadorGeometrico.Controller
             if (figuraGeometricaAtual == null)
                 return new Bitmap(0, 0);
 
-            figuraGeometricaAtual.GerarBitmap(zoom, offsetX, offsetY, largura, altura);
+            figuraGeometricaAtual.GerarBitmap(zoom, offsetX, offsetY, largura, altura, Color.White, Color.Black);
             return figuraGeometricaAtual.GetBitmap();
+        }
+
+        public void OrganizarFigurasArea()
+        {
+            figurasGeometricas = organizador.OrdenarPorArea(figurasGeometricas);
+        }
+
+        public void OrganizarFigurasAltura()
+        {
+            figurasGeometricas = organizador.OrdenarPorAltura(figurasGeometricas);
+        }
+
+        public void OrganizarFigurasLargura()
+        {
+            figurasGeometricas = organizador.OrdenarPorLargura(figurasGeometricas);
+        }
+
+        public void OrganizarFigurasOrdemCustomizada()
+        {
+            figurasGeometricas = organizador.OrdenarCustomizado(figurasGeometricas);
+        }
+
+        internal Bitmap VisualizarFiguraGeometrica(int idFigura)
+        {
+            foreach (var figura in figurasGeometricas)
+            {
+                if (figura.id == idFigura)
+                {
+                    figuraGeometricaAtual = figura;
+                }
+            }
+            return figuraGeometricaAtual.GetBitmap();
+        }
+
+        internal Bitmap VisualizarPlanoGeomtrico()
+        {
+            figuraGeometricaAtual = placaGravacao;
+            return figuraGeometricaAtual.GetBitmap();
+        }
+
+        internal void ExportarResultado(string diretorio, string nome)
+        {
+            DXFExport.Exportar(diretorio + nome, organizador.figurasPosicionadas);
         }
     }
 }

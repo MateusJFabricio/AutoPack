@@ -1,4 +1,5 @@
 ﻿using OrganizadorGeometrico.Controller;
+using OrganizadorGeometrico.Model;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,6 +18,7 @@ namespace OrganizadorGeometrico
         private bool transformarFigura;
         private float zoom = 1.1f, offsetX = 0f, offsetY = 0f;
         private int mousePosX = 0, mousePosY = 0;
+        private bool figurasOrdenadas = false;
 
         public Form_Principal()
         {
@@ -25,24 +27,55 @@ namespace OrganizadorGeometrico
 
         private void BtnImportarPlanoGeometrico_Click(object sender, EventArgs e)
         {
+
             //Abre o gerenciador de arquivo
             var arquivo = AbrirDXF(false);
 
             //Caso o usuario tenha selecionado um arquivo valido
             if (arquivo.Count > 0)
             {
-                diretorioPlacaGravacao = arquivo[0];
-                string nomeComExtensao = Path.GetFileName(arquivo[0]);
-                txtNomePlacaGravacao.Text = nomeComExtensao.Substring(0, nomeComExtensao.ToUpper().IndexOf(".DXF"));
-                Bitmap bm = control.AdicionarPlacaGravacao(diretorioPlacaGravacao, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
-                pbVisaoGrafica.BackgroundImage = bm;
-                pbVisaoGrafica.Refresh();
-                //Desabilita o botao de importar
-                btnImportarPlanoGeometrico.Enabled = false;
-                btnRemoverPlanoGeometrico.Enabled = true;
-                zoom = 1f;
-                offsetX = 0f;
-                offsetY = 0f;
+                try
+                {
+                    //Limpa a tela
+                    pbVisaoGrafica.BackgroundImage = new Bitmap(1, 1);
+                    pbVisaoGrafica.Refresh();
+
+                    //Pega o arquivo
+                    diretorioPlacaGravacao = arquivo[0];
+                    string nomeComExtensao = Path.GetFileName(arquivo[0]);
+                    txtNomePlacaGravacao.Text = nomeComExtensao.Substring(0, nomeComExtensao.ToUpper().IndexOf(".DXF"));
+
+                    //Cria o objeto DXF e carrega o bitmap
+                    Bitmap bm = control.AdicionarPlacaGravacao(diretorioPlacaGravacao);
+                    pbVisaoGrafica.BackgroundImage = bm;
+                    pbVisaoGrafica.Refresh();
+
+                    //Carrega as informacoes do objeto
+                    lblInformacaoPlanoGeometrico.Text = "Area: " + control.figuraGeometricaAtual.Area + " mm2 ";
+                    lblInformacaoPlanoGeometrico.Text += ", Altura: " + control.figuraGeometricaAtual.Altura + " mm ";
+                    lblInformacaoPlanoGeometrico.Text += ", Largura: " + control.figuraGeometricaAtual.Largura + " mm ";
+
+                    //Desabilita o botao de importar
+                    btnImportarPlanoGeometrico.Enabled = false;
+                    btnRemoverPlanoGeometrico.Enabled = true;
+                    btnVisualizarPlanoGeometrico.Enabled = true;
+
+                    //Atualiza as informacoes de Zoom
+                    zoom = 1f;
+                    offsetX = 0f;
+                    offsetY = 0f;
+
+                    //Bitmap bm = control.ResizeFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
+                    //pbVisaoGrafica.BackgroundImage = bm;
+                    //pbVisaoGrafica.Refresh();
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    txtNomePlacaGravacao.Text = "";
+                }
+
             }
         }
         
@@ -53,21 +86,42 @@ namespace OrganizadorGeometrico
             //Desabilita o botao de importar
             btnImportarPlanoGeometrico.Enabled = true;
             btnRemoverPlanoGeometrico.Enabled = false;
+            btnVisualizarPlanoGeometrico.Enabled = false;
 
             //Remove o nome do arquivo
             txtNomePlacaGravacao.Text = "";
+            lblInformacaoPlanoGeometrico.Text = "Nenhum plano carregado";
+
+            //Remove a placa de gravacao
+            control.RemoverPlacaGravacao();
         }
 
         private void BtnImportarFigurasGeometricas_Click(object sender, EventArgs e)
         {
+            figurasOrdenadas = false;
+
             foreach (var item in AbrirDXF(true))
             {
-                dgvArquivos.Rows.Add(NomeArquivo(item));
-                control.AdicionarFiguraGeometrica(item, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
+                control.AdicionarFiguraGeometrica(item);
+
+                AdicionarFiguraDataGridView(control.figuraGeometricaAtual);
+
+                //control.ResizeFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
             }
             zoom = 1f;
             offsetX = 0f;
             offsetY = 0f;
+        }
+
+        private void AdicionarFiguraDataGridView(DXFItem figura)
+        {
+            dgvArquivos.Rows.Add(figura.id.ToString(),
+                    figura.nome,
+                    figura.Ordem.ToString(),
+                    figura.Area.ToString(),
+                    figura.Largura.ToString(),
+                    figura.Altura.ToString()
+                    );
         }
 
         private List<string> AbrirDXF(bool multiFile)
@@ -112,23 +166,37 @@ namespace OrganizadorGeometrico
 
         private void BtnRemoverFigurasGeometricas_Click(object sender, EventArgs e)
         {
+            figurasOrdenadas = false; 
+            if (dgvArquivos.SelectedRows.Count <= 0)
+            {
+                MessageBox.Show("Selecione ao menos uma linha para excluir");
+                return;
+            }
 
             foreach (DataGridViewRow item in dgvArquivos.SelectedRows)
             {
+                control.RemoverFiguraGeometrica(Convert.ToInt32(item.Cells[0].Value));
                 dgvArquivos.Rows.RemoveAt(item.Index);
-            }
-
-            foreach (DataGridViewCell oneCell in dgvArquivos.SelectedCells)
-            {
-                if (oneCell.Selected)
-                    dgvArquivos.Rows.RemoveAt(oneCell.RowIndex);
             }
 
         }
 
         private void IniciarOrganizadorAutomaticoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            control.IniciarOrganizador();
+            //Ordena de acordo com o que esta selecionado
+            if (!figurasOrdenadas && control.figurasGeometricas.Count > 1)
+            {
+                MessageBox.Show("Voce deve ordenar as figuras geometricas antes");
+                return;
+            }
+
+            try
+            {
+                control.IniciarOrganizador();
+            } catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void btnMover_Click(object sender, EventArgs e)
@@ -145,6 +213,115 @@ namespace OrganizadorGeometrico
             btnMover.UseVisualStyleBackColor = true;
             moverHabilitado = false;
             zoomHabilitado = true;
+        }
+
+        private void btnVisualizar_Click(object sender, EventArgs e)
+        {
+            if (dgvArquivos.SelectedRows.Count < 1)
+            {
+                MessageBox.Show("Selecione a linha da figura geometrica");
+                return;
+            }
+
+            if (dgvArquivos.SelectedRows.Count > 1)
+            {
+                MessageBox.Show("Selecione somente uma figura geometrica");
+                return;
+            }
+
+            int idFigura = Convert.ToInt32(dgvArquivos.SelectedRows[0].Cells[0].Value);
+            Bitmap bitmap = control.VisualizarFiguraGeometrica(idFigura);
+            pbVisaoGrafica.BackgroundImage = bitmap;
+            pbVisaoGrafica.Refresh();
+
+            //Tamanho normal
+            zoom = 1f;
+            offsetX = 0f;
+            offsetY = 0f;
+        }
+
+        private void btnVisualizarPlanoGeometrico_Click(object sender, EventArgs e)
+        {
+            Bitmap bitmap = control.VisualizarPlanoGeomtrico();
+            pbVisaoGrafica.BackgroundImage = bitmap;
+            pbVisaoGrafica.Refresh();
+
+            //Tamanho normal
+            zoom = 1f;
+            offsetX = 0f;
+            offsetY = 0f;
+
+        }
+
+        private void btnOrdenar_Click(object sender, EventArgs e)
+        {
+            if (rbArea.Checked)
+            {
+                control.OrganizarFigurasArea();
+            }
+            else if (rbAltura.Checked)
+            {
+                control.OrganizarFigurasAltura();
+            }
+            else if (rbLargura.Checked)
+            {
+                control.OrganizarFigurasLargura();
+            }
+            else if (rbCustomizada.Checked)
+            {
+                control.OrganizarFigurasOrdemCustomizada();
+            }
+            else
+            {
+                MessageBox.Show("Selecione um tipo de ordenacao");
+                return;
+            }
+
+            //Popula o data grid view
+            dgvArquivos.Rows.Clear();
+            foreach (var figura in control.figurasGeometricas)
+            {
+                AdicionarFiguraDataGridView(figura);
+            }
+
+            figurasOrdenadas = true;
+        }
+
+        private void dgvArquivos_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 2)
+            {
+                int valor = 0;
+                if (Int32.TryParse(dgvArquivos.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), out valor))
+                {
+                    for (int i = 0; i < control.figurasGeometricas.Count; i++)
+                    {
+                        if (control.figurasGeometricas[i].id.ToString() == dgvArquivos.Rows[e.RowIndex].Cells[0].Value.ToString())
+                        {
+                            control.figurasGeometricas[i].Ordem = valor;
+                        }
+                    }
+                }else
+                {
+                    dgvArquivos.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+                    MessageBox.Show("Somente valor numero aceito");
+                }
+            }
+        }
+
+        private void timerResultados_Tick(object sender, EventArgs e)
+        {
+            int qntMensagens = control.mensagens.Count;
+
+            for (int i = 0; i < qntMensagens; i++)
+            {
+                rtResultados.AppendText(control.mensagens.Dequeue() + Environment.NewLine);
+            }
+        }
+
+        private void exportarDXFToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            control.ExportarResultado(@"C:/", "teste.dxf");
         }
 
         private void pbVisaoGrafica_MouseDown(object sender, MouseEventArgs e)

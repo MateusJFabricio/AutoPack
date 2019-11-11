@@ -1,5 +1,6 @@
 ﻿using netDxf;
 using netDxf.Blocks;
+using netDxf.Collections;
 using netDxf.Entities;
 using netDxf.Objects;
 using System;
@@ -9,9 +10,12 @@ using System.Linq;
 
 namespace OrganizadorGeometrico.Model
 {
-    class DXFItem
+
+    public class DXFItem
     {
 
+        public bool figuraFechada = true;
+        public int id;
         Bitmap bitmap;
         Graphics desenhador;
         public double Altura = 0, Largura = 0, Area = 0;
@@ -20,30 +24,224 @@ namespace OrganizadorGeometrico.Model
         public double[] NovaOrigem = new double[] { 0, 0 };
         DxfDocument docFigura;
         public string path;
-        string nome;
+        public string nome;
         PlotPaperUnits unidadeMedida;
+        public int[,] matrizOcupacao;
+        public EntityCollection entities;
 
-        public DXFItem(string path, int largura, int altura)
+        public int Ordem = 0;
+
+        public void InicializarDeArquivo(string path, int id, bool placaGravacao = false)
         {
             this.path = path;
+            this.id = id;
             BuscarAquivo();
+
+            //Identifica as dimensoes da figura geometrica
+            //Verifica se a figura geometrica esta aberta ou fechada
             BuscarDimensoes();
-            GerarBitmap(1f, 0, 0, largura, altura);
+
+            //Gera o Bitmap da figura geometrica para ser exibido em tela
+            bool preencherInteriorFigura = placaGravacao;
+            GerarBitmapInicial(preencherInteriorFigura);
+            
+            // !Problemas com regioes abertas quando deveriam estar fechadas
+            //Identifica a quantidade de regioes da figura geometrica
+            //if (figuraFechada)
+            //    IdentificacaoRegioesFigura();
+        }
+
+        public void RefreshInformacoes()
+        {
+            if (entities.Count > 0)
+            {
+                //Identifica as dimensoes da figura geometrica
+                //Verifica se a figura geometrica esta aberta ou fechada
+                BuscarDimensoes();
+
+                //Gera o Bitmap da figura geometrica para ser exibido em tela
+                GerarBitmapInicial(false);
+            }
+        }
+        private void IdentificacaoRegioesFigura()
+        {
+            matrizOcupacao = new int[(int) Largura, (int) Altura];
+            int linha = matrizOcupacao.GetLength(0);
+            int coluna = matrizOcupacao.GetLength(1);
+
+            //Preenche a matriz de ocupacao de acordo com os pixels desenhados em tela
+            for (int i = 0; i < linha; i++)
+            {
+                for (int j = 0; j < coluna; j++)
+                {
+                    matrizOcupacao[i, j] = Convert.ToInt32(bitmap.GetPixel(i, j).R) == 0 ? 0 : 1;
+                }
+            }
+
+            int qntRegioes = IdentificarRegioes(matrizOcupacao);
+
+            if (qntRegioes > 1)
+            {
+                qntRegioes = 0;
+            }
+        }
+
+        //Identifica a quantidade de regioes da figura
+        //Retorna a quantidade de regioes
+        private int IdentificarRegioes(int[,] matrizOcupacao)
+        {
+            bool pixelLivre = true;
+            int idRegiao = 0;
+
+
+            //matrizOcupacao = new int[,]{
+            //    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            //    {0, 0, 0, 1, 1, 1, 1, 1, 1, 0},
+            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+            //    {0, 1, 0, 0, 0, 0, 0, 0, 1, 0},
+            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+            //    {0, 0, 0, 1, 1, 1, 1, 1, 1, 0},
+            //    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+            //};
+
+            int[,] matrizRegioes = new int[matrizOcupacao.GetLength(0), matrizOcupacao.GetLength(1)];
+
+            //Inicia a verificacao das regioes
+            do
+            {
+                //Adiciona a semente
+                Vector2 semente = RetornarPixelVazio(matrizOcupacao, matrizRegioes);
+                pixelLivre = semente.X != -1;
+
+                if (pixelLivre)
+                {
+                    idRegiao++;
+                    VerificarPixelRegiao(semente, matrizOcupacao, idRegiao, ref matrizRegioes);
+                }
+            }
+            while (pixelLivre);
+                
+            return idRegiao;
+        }
+
+        private Vector2 RetornarPixelVazio(int[,] matrizOcupacao, int[,] matrizRegioes)
+        {
+            for (int i = 0; i < matrizOcupacao.GetLength(0) - 1; i++)
+            {
+                for (int j = 0; j < matrizOcupacao.GetLength(1) - 1; j++)
+                {
+                    if (matrizOcupacao[i, j] == 0 && matrizRegioes[i, j] == 0)
+                        return new Vector2(i, j);
+                }
+            }
+
+            return new Vector2(-1, -1);
+        }
+
+        //Crescimento de regiao
+        private void VerificarPixelRegiao(Vector2 semente, int[,] matrizOcupacao, int idRegiao, ref int[,] matrizRegioes)
+        {
+            Queue<Vector2> coordenadas = new Queue<Vector2>();
+            coordenadas.Enqueue(semente);
+            while(coordenadas.Count > 0)
+            {
+                Vector2 coordenada = coordenadas.Dequeue();
+
+                //Verifica a posicao atual
+                if (matrizOcupacao[(int)coordenada.X, (int)coordenada.Y] == 0)
+                {
+                    if (matrizRegioes[(int)coordenada.X, (int)coordenada.Y] == 0)
+                        matrizRegioes[(int)coordenada.X, (int)coordenada.Y] = idRegiao;
+                }
+
+                //Verifica a direita
+                if (coordenada.X + 1 <= matrizOcupacao.GetLength(0) - 1)
+                {
+                    if (matrizOcupacao[(int)coordenada.X + 1, (int)coordenada.Y] == 0)
+                    {
+                        if (matrizRegioes[(int)coordenada.X + 1, (int)coordenada.Y] == 0)
+                        {
+                            matrizRegioes[(int)coordenada.X + 1, (int)coordenada.Y] = idRegiao;
+                            coordenadas.Enqueue(new Vector2(coordenada.X + 1, coordenada.Y));
+                        }
+                    }
+                }
+
+                //Verifica a esquerda
+                if (coordenada.X - 1 >= 0)
+                {
+                    if (matrizOcupacao[(int)coordenada.X - 1, (int)coordenada.Y] == 0)
+                    {
+                        if (matrizRegioes[(int)coordenada.X - 1, (int)coordenada.Y] == 0)
+                        {
+                            matrizRegioes[(int)coordenada.X - 1, (int)coordenada.Y] = idRegiao;
+                            coordenadas.Enqueue(new Vector2(coordenada.X - 1, coordenada.Y));
+                        }
+                    }
+                }
+
+                //Verifica embaixo
+                if (coordenada.Y + 1 <= matrizOcupacao.GetLength(1) - 1)
+                {
+                    if (matrizOcupacao[(int)coordenada.X, (int)coordenada.Y + 1] == 0)
+                    {
+                        if (matrizRegioes[(int)coordenada.X, (int)coordenada.Y + 1] == 0)
+                        {
+                            matrizRegioes[(int)coordenada.X, (int)coordenada.Y + 1] = idRegiao;
+                            coordenadas.Enqueue(new Vector2(coordenada.X, coordenada.Y + 1));
+                        }
+                    }
+                }
+
+                //Verifica em cima
+                if (coordenada.Y - 1 >= 0)
+                {
+                    if (matrizOcupacao[(int)coordenada.X, (int)coordenada.Y - 1] == 0)
+                    {
+                        if (matrizRegioes[(int)coordenada.X, (int)coordenada.Y - 1] == 0)
+                        {
+                            matrizRegioes[(int)coordenada.X, (int)coordenada.Y - 1] = idRegiao;
+                            coordenadas.Enqueue(new Vector2(coordenada.X, coordenada.Y - 1));
+                        }
+                    }
+                }
+            }
+        }
+
+        public Bitmap MatrizOcupacao_Bitmap(int[,] matriz)
+        {
+            Bitmap bit = new Bitmap(matriz.GetLength(0), matriz.GetLength(1));
+            for (int i = 0; i < matriz.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriz.GetLength(1); j++)
+                {
+                    if (matriz[i, j] != 0)
+                        bit.SetPixel(i, j, Color.Black);
+                }
+            }
+            return bit;
         }
 
         private void BuscarAquivo()
         {
             docFigura = DxfDocument.Load(path);
             nome = docFigura.Name;
+            entities = docFigura.Blocks[Block.DefaultModelSpaceName].Entities;
+            //unidadeMedida = docFigura.Layouts["Layout1"].PlotSettings.PaperUnits;
         }
 
-        private void BuscarDimensoes()
+        private void GerarBitmapInicial(bool preencher)
         {
-            unidadeMedida = docFigura.Layouts["Layout1"].PlotSettings.PaperUnits;
+            GerarBitmap(1f, 0, 0, (int) Math.Round(Largura), (int) Math.Round(Altura), Color.Black, Color.White, preencher);
+        }
+        public void BuscarDimensoes()
+        { 
 
-            var entities = docFigura.Blocks[Block.DefaultModelSpaceName].Entities;
+            if (entities.Count <= 0)
+                throw new Exception("Nao ha figura geometrica neste arquivo!");
 
-            int quantidadeLay = docFigura.Layouts.Count;
 
             //Pegar a dimensao dos circulos
             AnalisarCirculos(entities.OfType<Circle>());
@@ -54,15 +252,9 @@ namespace OrganizadorGeometrico.Model
 
             AnalisarElipses(entities.OfType<Ellipse>());
 
-            AnalisarImagem(entities.OfType<netDxf.Entities.Image>());
-
-            AnalisarMultiLinhas(entities.OfType<MLine>());
-
-            AnalisarTexto(entities.OfType<Text>());
-
-            AnalisarPolilinhas(entities.OfType<Polyline>());
-
             AnalisarLwPolilinhas(entities.OfType<LwPolyline>());
+
+            AnalisarArcos(entities.OfType<Arc>());
 
             //AnalisarArcos(entities.OfType<Arc>());
 
@@ -78,70 +270,60 @@ namespace OrganizadorGeometrico.Model
 
             //Atualiza a area ocupada
             Area = (maiorX - menorX) * (maiorY - menorY);
+            Largura = maiorX - menorX;
+            Altura = maiorY - menorY;
         }
 
-        public void GerarBitmap(float zoom,float offsetX, float offsetY, int largura, int altura)
+        public void GerarBitmap(float zoom,float offsetX, float offsetY, int larguraBitmap, int alturaBitmap, Color corFundo, Color corLinha, bool preencherFigura = false)
         {
             if (zoom <= 0)
                 zoom = 0f;
 
-            int x = (int) ((maiorX - menorX + 2) * zoom);
-            int y = (int)((maiorY - menorY + 2) * zoom);
+            bitmap = new Bitmap(larguraBitmap + 10, alturaBitmap + 10);
 
-            if (x <= 0)
-                x = 1;
-
-            if (y <= 0)
-                y = 1;
-
-            bitmap = new Bitmap(largura, altura);
 
             desenhador = Graphics.FromImage(bitmap);
             desenhador.TranslateTransform((float) Origem[0] * -1 * zoom + offsetX, (float)Origem[1] * -1 * zoom + offsetY);
             //
             //  desenhador.ScaleTransform(10, 10);
 
-            var entities = docFigura.Blocks[Block.DefaultModelSpaceName].Entities;
+            //Preenche o bitmap
+            desenhador.Clear(corFundo);
+            
+            DesenharCirculos(entities.OfType<Circle>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
-            DesenharCirculos(entities.OfType<Circle>(), zoom, (float) altura / 2);
+            DesenharRetangulos(entities.OfType<Rectangle>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
-            DesenharRetangulos(entities.OfType<Rectangle>(), zoom, (float)altura / 2);
-            
-            DesenharLinhas(entities.OfType<Line>(), zoom, (float)altura / 2);
-            
-            DesenharEllipses(entities.OfType<Ellipse>(), zoom, (float)altura / 2);
-            
-            DesenharImagem(entities.OfType<netDxf.Entities.Image>(), zoom, (float)altura / 2);
-            
-            DesenharMultiLinhas(entities.OfType<MLine>(), zoom, (float)altura / 2);
-            
-            DesenharTexto(entities.OfType<Text>(), zoom, (float)altura / 2);
-            
-            DesenharPolilinhas(entities.OfType<Polyline>(), zoom, (float)altura / 2);
+            DesenharLinhas(entities.OfType<Line>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
-            DesenharLwPolilinhas(entities.OfType<LwPolyline>(), zoom, (float) altura / 2); //Texto
+            DesenharEllipses(entities.OfType<Ellipse>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
-            DesenharArcos(entities.OfType<Arc>(), zoom, (float)altura / 2);
+            DesenharLwPolilinhas(entities.OfType<LwPolyline>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha); //Texto
+
+            DesenharArcos(entities.OfType<Arc>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
         }
 
         #region Ferramentas de desenho
-        private void DesenharArcos(IEnumerable<Arc> arcs, float zoom, float deslocamentoOrigem)
+        private void DesenharArcos(IEnumerable<Arc> arcs, float zoom, float deslocamentoOrigem, Color cor, bool preencher)
         {
             foreach (var arc in arcs)
             {
-                desenhador.DrawArc(new Pen(Color.Black), 
-                    (float) arc.Center.X * zoom,
-                    deslocamentoOrigem - (float) arc.Center.Y * zoom, 
-                    (float) arc.Radius * zoom, 
-                    (float) arc.Radius * zoom, 
-                    (float) arc.StartAngle * zoom, 
-                    (float) arc.EndAngle * zoom
-                    );
+                if (!preencher)
+                {
+                    desenhador.DrawArc(new Pen(cor),
+                        (float)arc.Center.X * zoom,
+                        deslocamentoOrigem - (float)arc.Center.Y * zoom,
+                        (float)arc.Radius * zoom,
+                        (float)arc.Radius * zoom,
+                        (float)arc.StartAngle * zoom,
+                        (float)arc.EndAngle * zoom
+                        );
+                }
             }
         }
 
-        private void DesenharLwPolilinhas(IEnumerable<LwPolyline> lwPolylines, float zoom, float deslocamento)
+        private void DesenharLwPolilinhas(IEnumerable<LwPolyline> lwPolylines, float zoom, float deslocamento, Color cor)
         {
             foreach (var lwPolyline in lwPolylines)
             {
@@ -154,7 +336,7 @@ namespace OrganizadorGeometrico.Model
                     if (lwPolyline.Vertexes[i].Bulge != 0 || lwPolyline.Vertexes[i+1].Bulge != 0)
                         throw new Exception("O bulge ainda nao foi implementado");
 
-                    desenhador.DrawLine(new Pen(Color.Black),
+                    desenhador.DrawLine(new Pen(cor),
                             (float)lwPolyline.Vertexes[i].Position.X * zoom,
                             deslocamento - (float)lwPolyline.Vertexes[i].Position.Y * zoom,
                             (float)lwPolyline.Vertexes[i+1].Position.X * zoom,
@@ -164,100 +346,174 @@ namespace OrganizadorGeometrico.Model
             }
         }
 
-        private void DesenharRetangulos(IEnumerable<Rectangle> rectangles, float zoom, float deslocamentoOrigem)
+        private void DesenharRetangulos(IEnumerable<Rectangle> rectangles, float zoom, float deslocamentoOrigem, Color cor, bool preencher)
         {
             foreach (var rectangle in rectangles)
             {
-                desenhador.DrawRectangle(new Pen(Color.Black), 
-                    rectangle.X * zoom,
-                    deslocamentoOrigem - rectangle.Y * zoom, 
-                    rectangle.Width * zoom, 
-                    rectangle.Height * zoom
-                    );
-            }
-        }
-
-        private void DesenharPolilinhas(IEnumerable<Polyline> polylines, float zoom, float deslocamentoOrigem)
-        {
-            foreach (var line in polylines)
-            {
-                foreach(Line linha in line.Explode())
+                if (!preencher)
                 {
-                    desenhador.DrawLine(new Pen(Color.Black), 
-                        (float)linha.StartPoint.X * zoom,
-                        deslocamentoOrigem - (float)linha.StartPoint.Y * zoom, 
-                        (float)linha.EndPoint.X * zoom,
-                        deslocamentoOrigem - (float)linha.EndPoint.Y * zoom
+                    desenhador.DrawRectangle(new Pen(cor),
+                        rectangle.X * zoom,
+                        deslocamentoOrigem - rectangle.Y * zoom,
+                        rectangle.Width * zoom,
+                        rectangle.Height * zoom
+                        );
+                }else
+                {
+                    desenhador.FillRectangle(new SolidBrush(cor),
+                        rectangle.X * zoom,
+                        deslocamentoOrigem - rectangle.Y * zoom,
+                        rectangle.Width * zoom,
+                        rectangle.Height * zoom
                         );
                 }
             }
         }
 
-        private void DesenharTexto(IEnumerable<Text> texts, float zoom, float v)
-        {
-            foreach (var item in texts)
-            {
-                throw new NotImplementedException();
-            }   
-        }
-
-        private void DesenharMultiLinhas(IEnumerable<MLine> mLines, float zoom, float deslocamentoOrigem)
-        {
-            foreach (var item in mLines)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private void DesenharImagem(IEnumerable<netDxf.Entities.Image> images, float zoom, float v)
-        {
-            foreach (var item in images)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private void DesenharEllipses(IEnumerable<Ellipse> ellipses, float zoom, float deslocamentoOrigem)
+        private void DesenharEllipses(IEnumerable<Ellipse> ellipses, float zoom, float deslocamentoOrigem, Color cor, bool preencher)
         {
             foreach (var ellipse in ellipses)
             {
-                desenhador.RotateTransform((float) ellipse.Rotation);
-                desenhador.DrawArc(new Pen(Color.Black), 
-                    (float)ellipse.Center.X * zoom,
-                    deslocamentoOrigem - (float)ellipse.Center.Y * zoom, 
-                    (float)ellipse.MajorAxis * zoom, 
-                    (float) ellipse.MinorAxis * zoom, 
-                    (float)ellipse.StartAngle * zoom, 
-                    (float)ellipse.StartAngle * zoom
-                    );
+                desenhador.RotateTransform((float)ellipse.Rotation);
+
+                if (!preencher)
+                {
+                    desenhador.DrawEllipse(new Pen(cor),
+                        (float)ellipse.Center.X * zoom,
+                        deslocamentoOrigem - (float)ellipse.Center.Y * zoom,
+                        (float)ellipse.MajorAxis * zoom,
+                        (float)ellipse.MinorAxis * zoom
+                        );
+                }else
+                {
+                    desenhador.FillEllipse(new SolidBrush(cor),
+                        (float)ellipse.Center.X,
+                        deslocamentoOrigem - (float)ellipse.Center.Y,
+                        (float)ellipse.MajorAxis,
+                        (float)ellipse.MinorAxis
+                        );
+                }
             }
             desenhador.RotateTransform(0f);
+
+            
         }
 
-        private void DesenharLinhas(IEnumerable<Line> lines, float zoom, float deslocamentoOrigem)
+        private void DesenharLinhas(IEnumerable<Line> lines, float zoom, float deslocamentoOrigem, Color cor, bool preencher)
         {
-            foreach (var line in lines)
+            List<Line> linhas = lines.ToList();
+
+            //Desenha as linhas normais, sem preencher o interior da figura
+            if (!preencher)
             {
-                desenhador.DrawLine(new Pen(Color.Black), 
-                    (float) line.StartPoint.X * zoom,
-                    deslocamentoOrigem - (float) line.StartPoint.Y * zoom, 
-                    (float) line.EndPoint.X * zoom,
-                    deslocamentoOrigem - (float) line.EndPoint.Y * zoom
-                    );
+                foreach (var line in linhas)
+                {
+                
+                    desenhador.DrawLine(new Pen(cor, 1),
+                        (float)line.StartPoint.X * zoom,
+                        deslocamentoOrigem - (float)line.StartPoint.Y * zoom,
+                        (float)line.EndPoint.X * zoom,
+                        deslocamentoOrigem - (float)line.EndPoint.Y * zoom
+                        );
+                }
+             }else
+
+            //Desenha a figura preenchida.
+            //Para isto deve ser ordenado os vertices das linhas
+            //Depois deve ser desenhado o preenchimento, com base no caminho dos vertices
+            if (linhas.Count > 0 && preencher && figuraFechada)
+            {
+                List<Vector2> verticesOrdenados = new List<Vector2>();
+                //Ordena os vertices
+                verticesOrdenados = OrdenarVertices(linhas);
+
+                //Popula o caminhos dos vertices
+                PointF[] pontos = new PointF[verticesOrdenados.Count()];
+                for (int i = 0; i < verticesOrdenados.Count(); i++)
+                {
+                    pontos[i] = new PointF((float)verticesOrdenados[i].X, deslocamentoOrigem - (float)verticesOrdenados[i].Y);
+                }
+                //Desenha a figura
+                desenhador.FillPolygon(new SolidBrush(cor), pontos);
             }
 
         }
 
-        private void DesenharCirculos(IEnumerable<Circle> circles, float zoom, float deslocamentoOrigem)
+        private List<Vector2> OrdenarVertices(List<Line> linhas)
         {
+            List<Vector2> verticesOrdenados = new List<Vector2>();
+            Vector2 verticeAtual = new Vector2(0, 0);
+            bool verticeEncontrado = false;
+            do
+            {
+                if (verticesOrdenados.Count == 0)
+                {
+                    verticeAtual = new Vector2(linhas[0].EndPoint.X, linhas[0].EndPoint.Y);
+                    verticesOrdenados.Add(new Vector2(linhas[0].StartPoint.X, linhas[0].StartPoint.Y));
+                    verticesOrdenados.Add(verticeAtual);
+
+                    linhas.Remove(linhas[0]);
+                    verticeEncontrado = true;
+                }
+                else
+                {
+                    foreach (var linha in linhas)
+                    {
+                        verticeEncontrado = false;
+                        //Endpoint do ultimo seja o Startpoint do atual
+                        if (VerticesProximos(verticeAtual, new Vector2(linha.StartPoint.X, linha.StartPoint.Y), 1))
+                        {
+                            verticeAtual = new Vector2(linha.EndPoint.X, linha.EndPoint.Y);
+                            verticesOrdenados.Add(verticeAtual);
+                            linhas.Remove(linha);
+                            verticeEncontrado = true;
+                            break;
+                        }
+                        else
+                        //Endpoint do ultimo seja o Startpoint do atual
+                        if (VerticesProximos(verticeAtual, new Vector2(linha.EndPoint.X, linha.EndPoint.Y), 1))
+                        {
+                            verticeAtual = new Vector2(linha.StartPoint.X, linha.StartPoint.Y);
+                            verticesOrdenados.Add(verticeAtual);
+                            linhas.Remove(linha);
+                            verticeEncontrado = true;
+                            break;
+                        }
+                    }
+                    if (!verticeEncontrado)
+                        throw new Exception("Par do vertice atual nao foi encontrado");
+                }
+
+            } while (linhas.Count > 0);
+
+            return verticesOrdenados;
+        }
+
+        private void DesenharCirculos(IEnumerable<Circle> circles, float zoom, float deslocamentoOrigem, Color cor, bool preencher)
+        {
+            if (circles.Count() > 1)
+                figuraFechada = false;
+
             foreach (var circle in circles)
             {
-                desenhador.DrawEllipse(new Pen(Color.Black), 
-                    (float) circle.Center.X * zoom,
-                    deslocamentoOrigem - (float) circle.Center.Y * zoom,
-                    (float) circle.Radius * zoom, 
-                    (float) circle.Radius * zoom
-                    );
+                if (!preencher)
+                {
+                    desenhador.DrawEllipse(
+                        new Pen(cor, 2),
+                        (float)circle.Center.X - (float)circle.Radius * zoom, //x
+                        deslocamentoOrigem - (float)circle.Center.Y - (float)circle.Radius * zoom, //y
+                        (float)circle.Radius * 2 * zoom, //Deve ser multiplicado por 2
+                        (float)circle.Radius * 2 * zoom
+                        );
+                }else
+                {
+                    desenhador.FillEllipse(new SolidBrush(cor),
+                        (float)circle.Center.X - (float)circle.Radius * zoom, //x
+                        deslocamentoOrigem - (float)circle.Center.Y - (float)circle.Radius * zoom, //y
+                        (float)circle.Radius * 2 * zoom, //Deve ser multiplicado por 2
+                        (float)circle.Radius * 2 * zoom
+                        );
+                }
             }
         }
 
@@ -271,6 +527,7 @@ namespace OrganizadorGeometrico.Model
         #region Analise de tamanho
         private void AnalisarLinhas(IEnumerable<Line> linhas)
         {
+            List<Vector2> vertices = new List<Vector2>();
             foreach (var linha in linhas)
             {
                 
@@ -285,34 +542,21 @@ namespace OrganizadorGeometrico.Model
 
                 //Verifica Max Y
                 VerificaMaxY(linha.StartPoint.Y < linha.EndPoint.Y ? linha.EndPoint.Y : linha.StartPoint.Y);
+
+                vertices.Add(new Vector2(linha.StartPoint.X, linha.StartPoint.Y));
+                vertices.Add(new Vector2(linha.EndPoint.X, linha.EndPoint.Y));
             }
-        }
 
-        private void AnalisarPolilinhas(IEnumerable<Polyline> polylines)
-        {
-
-            foreach (Polyline polyline in polylines)
+            if (!FiguraVerticesFechados(vertices))
             {
-                foreach (var vertex in polyline.Vertexes)
-                {
-                    //Verifica Min X
-                    VerificaMinX(vertex.Position.X);
-
-                    //Verifica Min Y
-                    VerificaMinY(vertex.Position.Y);
-
-                    //Verifica Max X
-                    VerificaMaxX(vertex.Position.X);
-
-                    //Verifica Max Y
-                    VerificaMaxY(vertex.Position.Y);
-
-                }
+                figuraFechada = false;
             }
         }
 
         private void AnalisarLwPolilinhas(IEnumerable<LwPolyline> lwPolylines)
         {
+            List<Vector2> vertices = new List<Vector2>();
+
             foreach (LwPolyline lwPolyline in lwPolylines)
             {
                 foreach (LwPolylineVertex vertex in lwPolyline.Vertexes)
@@ -338,71 +582,41 @@ namespace OrganizadorGeometrico.Model
                         //double raio = 
                         //double ang = Math.Atan(vertex.Bulge) * 4;
                     }
+
+                    vertices.Add(new Vector2(vertex.Position.X, vertex.Position.Y));
                 }
             }
-        }
-        
 
-        private void AnalisarTexto(IEnumerable<Text> texts)
-        {
-            foreach (var text in texts)
-            {
-                //Verifica Min X
-                VerificaMinX(text.Position.X);
+            //Analisar se todos os vertices e uma figura fechada ou aberta
+            if (!FiguraVerticesFechados(vertices))
+                figuraFechada = false;
 
-                //Verifica Min Y
-                VerificaMinY(text.Position.Y);
-
-                //Verifica Max X
-                VerificaMaxX(text.Position.X + text.Width);
-
-                //Verifica Max Y
-                VerificaMaxY(text.Position.Y + text.Height);
-            }
-        }
-
-        private void AnalisarMultiLinhas(IEnumerable<MLine> mLines)
-        {
-            foreach (var mLine in mLines)
-            {
-                AnalisarLinhas((IEnumerable<Line>)mLine.Explode());
-            }
-        }
-
-        private void AnalisarImagem(IEnumerable<netDxf.Entities.Image> images)
-        {
-            foreach (var image in images)
-            {
-                //Verifica Min X
-                VerificaMinX(image.Position.X);
-
-                //Verifica Min Y
-                VerificaMinY(image.Position.Y);
-
-                //Verifica Max X
-                VerificaMaxX(image.Position.X + image.Width);
-
-                //Verifica Max Y
-                VerificaMaxX(image.Position.Y + image.Height);
-            }
         }
 
         private void AnalisarElipses(IEnumerable<Ellipse> ellipses)
         {
             foreach (var ellipse  in ellipses)
             {
-                //Verifica Min X
-                VerificaMinX(ellipse.Center.X - ellipse.MajorAxis);
+                if (ellipse.IsFullEllipse)
+                {
+                    //Verifica Min X
+                    VerificaMinX(ellipse.Center.X - ellipse.MajorAxis);
 
-                //Verifica Min Y
-                VerificaMinY(ellipse.Center.Y - ellipse.MajorAxis);
+                    //Verifica Min Y
+                    VerificaMinY(ellipse.Center.Y - ellipse.MajorAxis);
 
-                //Verifica Max X
-                VerificaMaxX(ellipse.Center.X + ellipse.MajorAxis);
+                    //Verifica Max X
+                    VerificaMaxX(ellipse.Center.X + ellipse.MajorAxis);
 
-                //Verifica Max Y
-                VerificaMaxX(ellipse.Center.Y + ellipse.MajorAxis);
+                    //Verifica Max Y
+                    VerificaMaxX(ellipse.Center.Y + ellipse.MajorAxis);
+                }
+
             }
+
+            if (ellipses.Count() > 1)
+                figuraFechada = false;
+            
         }
 
         private void AnalisarCirculos(IEnumerable<Circle> circulos)
@@ -423,21 +637,43 @@ namespace OrganizadorGeometrico.Model
             }
         }
 
+        private void AnalisarArcos(IEnumerable<Arc> arcs)
+        {
+            foreach (Arc arc in arcs)
+            {
+                //Verifica Min X
+                VerificaMinX(arc.Center.X - arc.Radius);
+
+                //Verifica Min Y
+                VerificaMinY(arc.Center.Y - arc.Radius);
+
+                //Verifica Max X
+                VerificaMaxX(arc.Center.X + arc.Radius);
+
+                //Verifica Max Y
+                VerificaMaxY(arc.Center.Y + arc.Radius);
+            }
+        }
+
         private void AnalisarRetangulos(IEnumerable<Rectangle> rectangles)
         {
+            if (rectangles.Count() > 1)
+                figuraFechada = false;
+
             foreach (var rectangle in rectangles)
             {
                 //Verifica Min X
-                VerificaMinX(rectangle.X - rectangle.Height);
+                VerificaMinX(rectangle.X);
 
                 //Verifica Min Y
-                VerificaMinY(rectangle.Y - rectangle.Width);
+                VerificaMinY(rectangle.Y);
 
                 //Verifica Max X
-                VerificaMaxX(rectangle.X);
+                VerificaMaxX(rectangle.X + rectangle.Width);
 
                 //Verifica Max Y
-                VerificaMaxY(rectangle.Y);
+                VerificaMaxY(rectangle.Y + rectangle.Height);
+
             }
         }
         
@@ -465,6 +701,34 @@ namespace OrganizadorGeometrico.Model
         {
             if (val > maiorY)
                 maiorY = val;
+        }
+
+        private bool FiguraVerticesFechados(List<Vector2> vertices)
+        {
+            
+            foreach (var vertice1 in vertices)
+            {
+                int numeroVerticesProx = 0;
+                foreach (var vertice2 in vertices)
+                {
+                    if (VerticesProximos(vertice1, vertice2, 1))
+                        numeroVerticesProx++;
+                }
+
+                if (numeroVerticesProx != 2)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool VerticesProximos(Vector2 v1, Vector2 v2, double tolerancia)
+        {
+            if (Math.Abs(v1.X - v2.X) <= tolerancia)
+                if (Math.Abs(v1.Y - v2.Y) <= tolerancia)
+                    return true;
+
+            return false;
         }
 
     }
