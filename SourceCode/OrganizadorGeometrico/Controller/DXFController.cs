@@ -13,6 +13,8 @@ namespace OrganizadorGeometrico.Controller
         public List<DXFItem> figurasGeometricas = new List<DXFItem>();
         private int idFiguraGeometrica = 0;
         public Queue<string> mensagens = new Queue<string>();
+        public int FigurasProcessadas { get => organizador.progressoAlgoritmo;}
+        public bool FigurasOrganizadas { get => organizador.sucessoOrganizador;}
 
         public Bitmap IniciarOrganizador()
         {
@@ -30,14 +32,6 @@ namespace OrganizadorGeometrico.Controller
             {
                 mensagens.Enqueue(log);
             }
-
-
-
-            if (organizador.sucessoOrganizador)
-                mensagens.Enqueue("Organizador concluido com sucesso");
-            else
-               mensagens.Enqueue("Organizador concluido sem sucesso");
-            
 
             return organizador.BitmapResultado();
         }
@@ -135,9 +129,9 @@ namespace OrganizadorGeometrico.Controller
             return figuraGeometricaAtual.GetBitmap();
         }
 
-        internal void ExportarResultado(string diretorio, string nome)
+        internal void ExportarResultado(string diretorio)
         {
-            DXFExport.Exportar(diretorio + nome, organizador.figurasPosicionadas);
+            DXFExport.Exportar(diretorio, organizador.figurasPosicionadas);
         }
     }
 }

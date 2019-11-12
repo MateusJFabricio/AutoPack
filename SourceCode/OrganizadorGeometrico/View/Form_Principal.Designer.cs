@@ -73,8 +73,9 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.rtResultados = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.timerResultados = new System.Windows.Forms.Timer(this.components);
+            this.timerProgressbar = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -496,7 +497,7 @@
             // 
             this.Resultados.Controls.Add(this.panel1);
             this.Resultados.Controls.Add(this.label2);
-            this.Resultados.Controls.Add(this.progressBar1);
+            this.Resultados.Controls.Add(this.progressBar);
             this.Resultados.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.Resultados.Location = new System.Drawing.Point(0, 554);
             this.Resultados.Name = "Resultados";
@@ -535,19 +536,24 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Progresso:";
             // 
-            // progressBar1
+            // progressBar
             // 
-            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(3, 148);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(606, 21);
-            this.progressBar1.TabIndex = 2;
+            this.progressBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.progressBar.Location = new System.Drawing.Point(3, 148);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(606, 21);
+            this.progressBar.TabIndex = 2;
             // 
             // timerResultados
             // 
             this.timerResultados.Enabled = true;
             this.timerResultados.Interval = 1000;
             this.timerResultados.Tick += new System.EventHandler(this.timerResultados_Tick);
+            // 
+            // timerProgressbar
+            // 
+            this.timerProgressbar.Interval = 10;
+            this.timerProgressbar.Tick += new System.EventHandler(this.timerProgressbar_Tick);
             // 
             // Form_Principal
             // 
@@ -610,7 +616,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RichTextBox rtResultados;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.PictureBox pbVisaoGrafica;
         private System.Windows.Forms.Panel panel2;
@@ -633,6 +639,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Largura;
         private System.Windows.Forms.DataGridViewTextBoxColumn Altura;
         private System.Windows.Forms.Timer timerResultados;
+        private System.Windows.Forms.Timer timerProgressbar;
     }
 }
 

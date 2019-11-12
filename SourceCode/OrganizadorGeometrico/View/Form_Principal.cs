@@ -2,6 +2,7 @@
 using OrganizadorGeometrico.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -19,6 +20,7 @@ namespace OrganizadorGeometrico
         private float zoom = 1.1f, offsetX = 0f, offsetY = 0f;
         private int mousePosX = 0, mousePosY = 0;
         private bool figurasOrdenadas = false;
+        private bool figurasOrganizadas = false;
 
         public Form_Principal()
         {
@@ -34,6 +36,7 @@ namespace OrganizadorGeometrico
             //Caso o usuario tenha selecionado um arquivo valido
             if (arquivo.Count > 0)
             {
+                progressBar.Value = 0;
                 try
                 {
                     //Limpa a tela
@@ -108,6 +111,7 @@ namespace OrganizadorGeometrico
 
                 //control.ResizeFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
             }
+            progressBar.Value = 0;
             zoom = 1f;
             offsetX = 0f;
             offsetY = 0f;
@@ -183,6 +187,8 @@ namespace OrganizadorGeometrico
 
         private void IniciarOrganizadorAutomaticoToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var stopwatch = new Stopwatch();
+            
             //Ordena de acordo com o que esta selecionado
             if (!figurasOrdenadas && control.figurasGeometricas.Count > 1)
             {
@@ -192,9 +198,23 @@ namespace OrganizadorGeometrico
 
             try
             {
-                control.IniciarOrganizador();
+                figurasOrganizadas = false;
+                rtResultados.Clear();
+                stopwatch.Start();
+                timerProgressbar.Start();
+
+                Bitmap bm = control.IniciarOrganizador();
+                pbVisaoGrafica.BackgroundImage = bm;
+                pbVisaoGrafica.Refresh();
+
+                figurasOrganizadas = control.FigurasOrganizadas;
+                stopwatch.Stop();
+                rtResultados.AppendText($"Tempo total de execucao do algoritmo: {stopwatch.Elapsed.TotalSeconds} segundos" + Environment.NewLine);
             } catch (Exception ex)
             {
+                figurasOrganizadas = false;
+                timerProgressbar.Stop();
+                stopwatch.Stop();
                 MessageBox.Show(ex.Message);
             }
         }
@@ -321,7 +341,53 @@ namespace OrganizadorGeometrico
 
         private void exportarDXFToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            control.ExportarResultado(@"C:/", "teste.dxf");
+            if (figurasOrganizadas)
+            {
+                SaveFileDialog saveFile = new SaveFileDialog();
+                saveFile.Filter = "DXF (*.dxf)|*.dxf";
+                saveFile.Title = "Exportar resultado";
+
+                if (saveFile.ShowDialog() == DialogResult.OK)
+                {
+                    control.ExportarResultado(saveFile.FileName);
+                    rtResultados.AppendText("Figura exportada para o caminho " + saveFile.FileName);
+                    Process.Start(saveFile.FileName);
+                }
+            }
+            else
+                MessageBox.Show("Nao ha o que exportar! Execute o algoritmo de organizacao");
+        }
+
+        private void timerProgressbar_Tick(object sender, EventArgs e)
+        {
+            if (figurasOrganizadas)
+            {
+                progressBar.Value = 100;
+                timerProgressbar.Stop();
+                return;
+            }
+
+            switch (control.FigurasProcessadas)
+            {
+                case 0:
+                    progressBar.Value = 0;
+                    break;
+                case 1:
+                    progressBar.Value = 25;
+                    break;
+                case 2:
+                    progressBar.Value = 50;
+                    break;
+                case 3:
+                    progressBar.Value = 75;
+                    break;
+                case 4:
+                    progressBar.Value = 100;
+                    timerProgressbar.Stop();
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void pbVisaoGrafica_MouseDown(object sender, MouseEventArgs e)

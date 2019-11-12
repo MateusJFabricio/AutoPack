@@ -21,7 +21,6 @@ namespace OrganizadorGeometrico.Model
         public double Altura = 0, Largura = 0, Area = 0;
         private double menorX = 0, menorY = 0, maiorX = 0, maiorY = 0;
         public double[] Origem = new double[] { 0, 0 };
-        public double[] NovaOrigem = new double[] { 0, 0 };
         DxfDocument docFigura;
         public string path;
         public string nome;
@@ -229,6 +228,7 @@ namespace OrganizadorGeometrico.Model
             docFigura = DxfDocument.Load(path);
             nome = docFigura.Name;
             entities = docFigura.Blocks[Block.DefaultModelSpaceName].Entities;
+            
             //unidadeMedida = docFigura.Layouts["Layout1"].PlotSettings.PaperUnits;
         }
 
@@ -245,8 +245,6 @@ namespace OrganizadorGeometrico.Model
 
             //Pegar a dimensao dos circulos
             AnalisarCirculos(entities.OfType<Circle>());
-
-            AnalisarRetangulos(entities.OfType<Rectangle>());
 
             AnalisarLinhas(entities.OfType<Line>());
 
@@ -291,8 +289,6 @@ namespace OrganizadorGeometrico.Model
             desenhador.Clear(corFundo);
             
             DesenharCirculos(entities.OfType<Circle>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
-
-            DesenharRetangulos(entities.OfType<Rectangle>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
             DesenharLinhas(entities.OfType<Line>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
@@ -342,30 +338,6 @@ namespace OrganizadorGeometrico.Model
                             (float)lwPolyline.Vertexes[i+1].Position.X * zoom,
                             deslocamento - (float)lwPolyline.Vertexes[i+1].Position.Y * zoom
                             );
-                }
-            }
-        }
-
-        private void DesenharRetangulos(IEnumerable<Rectangle> rectangles, float zoom, float deslocamentoOrigem, Color cor, bool preencher)
-        {
-            foreach (var rectangle in rectangles)
-            {
-                if (!preencher)
-                {
-                    desenhador.DrawRectangle(new Pen(cor),
-                        rectangle.X * zoom,
-                        deslocamentoOrigem - rectangle.Y * zoom,
-                        rectangle.Width * zoom,
-                        rectangle.Height * zoom
-                        );
-                }else
-                {
-                    desenhador.FillRectangle(new SolidBrush(cor),
-                        rectangle.X * zoom,
-                        deslocamentoOrigem - rectangle.Y * zoom,
-                        rectangle.Width * zoom,
-                        rectangle.Height * zoom
-                        );
                 }
             }
         }
@@ -652,28 +624,6 @@ namespace OrganizadorGeometrico.Model
 
                 //Verifica Max Y
                 VerificaMaxY(arc.Center.Y + arc.Radius);
-            }
-        }
-
-        private void AnalisarRetangulos(IEnumerable<Rectangle> rectangles)
-        {
-            if (rectangles.Count() > 1)
-                figuraFechada = false;
-
-            foreach (var rectangle in rectangles)
-            {
-                //Verifica Min X
-                VerificaMinX(rectangle.X);
-
-                //Verifica Min Y
-                VerificaMinY(rectangle.Y);
-
-                //Verifica Max X
-                VerificaMaxX(rectangle.X + rectangle.Width);
-
-                //Verifica Max Y
-                VerificaMaxY(rectangle.Y + rectangle.Height);
-
             }
         }
         

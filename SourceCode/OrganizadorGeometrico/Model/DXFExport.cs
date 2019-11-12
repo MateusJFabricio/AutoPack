@@ -14,12 +14,12 @@ namespace OrganizadorGeometrico.Model
         {
             DxfDocument dxf = new DxfDocument();
 
-            foreach (var c in item.entities.OfType<Circle>())
+            foreach (var c in item.entities.OfType<EntityObject>())
             {
                 dxf.AddEntity((EntityObject)c.Clone());
             }
 
-            dxf.Save(@"C:/Temp/teste.dxf");
+            dxf.Save(path);
         }
     }
 }

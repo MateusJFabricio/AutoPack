@@ -1,9 +1,9 @@
-﻿using System;
+﻿using netDxf.Entities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using netDxf;
 
 namespace OrganizadorGeometrico.Model
 {
@@ -28,9 +28,16 @@ namespace OrganizadorGeometrico.Model
         List<ItemOrganizado> itemOrganizados = new List<ItemOrganizado>();
         public DXFItem figurasPosicionadas;
         public bool sucessoOrganizador = false;
+        internal int progressoAlgoritmo = 0; //valor de 0 a 4
+        
+        //Espacamento entre as figuras geometricas
+        int espacamentoX = 3;
+        int espacamentoY = 3;
 
         public void IniciarOrganizador(DXFItem placaGravacao, List<DXFItem> figurasGeometricas)
         {
+            progressoAlgoritmo = 0;
+
             sucessoOrganizador = false;
             itemOrganizados.Clear();
             this.PlacaGravacao = placaGravacao;
@@ -39,30 +46,56 @@ namespace OrganizadorGeometrico.Model
             //Atualiza o plano de gravacao para o tamanho original
             PlacaGravacao.GerarBitmap(1, 0, 0, (int)PlacaGravacao.Largura + 1, (int)PlacaGravacao.Altura + 1, Color.Black, Color.White, true);
 
+            //Atualiza o progresso
+            progressoAlgoritmo++;
+
+            //Remove figuras com area maior que a area do plano de gravacao
             figurasGeometricas = RemoverFigurasIcompativeis(figurasGeometricas);
-            
+
+            //Atualiza o progresso
+            progressoAlgoritmo++;
+
+            //Caso nao tenha sobrado figuras, interrompe a execucao do algoritmo
             if (figurasGeometricas.Count == 0)
             {
                 log.Enqueue("Nao sobrou figura geometrica para organizar");
+                //Atualiza o progresso
+                progressoAlgoritmo = 4;
                 return;
             }
 
+            //Executa o algoritmo de organizacao das figuras geometricas dentro do plano
             OrganizarFiguras(figurasGeometricas);
 
-            figurasPosicionadas = new DXFItem();
+            //Atualiza o progresso
+            progressoAlgoritmo++;
+
+            //Cria a posiciona cada entidade dentro do plano geometrico
             PosicionarFiguras(itemOrganizados);
+
+            //Atualiza o progresso
+            progressoAlgoritmo++;
+
+            if (itemOrganizados.Count <= 0)
+                log.Enqueue("Finalizado a organizacao sem sucesso em nenhuma figura");
+            else if (sucessoOrganizador)
+                log.Enqueue("Organizador concluido com sucesso");
+            else
+                log.Enqueue("Organizador concluido sem sucesso");
 
         }
 
         private void PosicionarFiguras(List<ItemOrganizado> itemOrganizados)
         {
+            figurasPosicionadas = new DXFItem();
             figurasPosicionadas.entities = new netDxf.Collections.EntityCollection();
+            figurasPosicionadas.entities.AddRange(PlacaGravacao.entities);
             foreach (var item in itemOrganizados)
             {
-                figurasPosicionadas.entities.AddRange(item.Figura.entities);
-                figurasPosicionadas.RefreshInformacoes();
+                figurasPosicionadas.entities.AddRange(AtualizarPosicaoEntidades(item).entities);
                 sucessoOrganizador = true;
             }
+            figurasPosicionadas.RefreshInformacoes();
         }
 
         private void OrganizarFiguras(List<DXFItem> figuras)
@@ -74,18 +107,87 @@ namespace OrganizadorGeometrico.Model
                 int x = 0, y = 0;
                 if (EncontrarPosicaoFiguraNoPlano(figura, out x, out y, bitmapOcupacao))
                 {
+                    log.Enqueue("Alocado a figura " + figura.nome + " na posicao X: " + x.ToString() + " e Y: " + y.ToString());
                     //Adiciona o item na lista de itens organizado
                     ItemOrganizado item = new ItemOrganizado(figura);
-                    item.X = x;
-                    item.Y = y;
+                    item.X = x + espacamentoX;
+                    item.Y = y + espacamentoY;
                     item.FiguraPosicionada = true;
                     itemOrganizados.Add(item);
 
                     //Ocupa a area do bitmap
                     PreencherAreaPosicionamento(item, ref bitmapOcupacao);
                 }
+                else
+                    log.Enqueue("Nao foi possivel encontrar espaco para alocar a figura " + figura.nome);
 
             }
+        }
+
+        private DXFItem AtualizarPosicaoEntidades(ItemOrganizado item)
+        {
+            DXFItem figura = item.Figura;          
+
+            //Circulos
+            List<Circle> circles = figura.entities.OfType<Circle>().ToList();
+            foreach (var circle in circles)
+            {
+                figura.entities.Remove(circle);
+                Circle circleAtualizado = new Circle(
+                    new Vector2(circle.Center.X + item.X - figura.Origem[0], circle.Center.Y + item.Y - figura.Origem[1]), //Centro
+                    circle.Radius); //Raio
+                figura.entities.Add(circleAtualizado);
+            }
+
+            //Linhas
+            List<Line> lines = figura.entities.OfType<Line>().ToList();
+            foreach (var line in lines)
+            {
+                figura.entities.Remove(line);
+                Line linha = new Line(
+                    new Vector2(line.StartPoint.X + item.X - figura.Origem[0], line.StartPoint.Y + item.Y - figura.Origem[1]), //Start
+                    new Vector2(line.EndPoint.X + item.X - figura.Origem[0], line.EndPoint.Y + item.Y - figura.Origem[1]) //End
+                    );
+                figura.entities.Add(linha);
+            }
+
+            //Elipses
+            List<Ellipse> ellipses = figura.entities.OfType<Ellipse>().ToList();
+            foreach (var ellipse in ellipses)
+            {
+                figura.entities.Remove(ellipse);
+                Ellipse ellipseAtualizado = new Ellipse(
+                    new Vector2(ellipse.Center.X + item.X, ellipse.Center.Y + item.Y), 
+                    ellipse.MajorAxis, 
+                    ellipse.MinorAxis
+                    );
+                figura.entities.Add(ellipseAtualizado);
+            }
+
+            //LwPolilinhas
+            List<LwPolyline> lwPolylines = figura.entities.OfType<LwPolyline>().ToList();
+            foreach (var lwPolyline in lwPolylines)
+            {
+                figura.entities.Remove(lwPolyline);
+                LwPolyline polyline = new LwPolyline();
+                foreach (var vertex in lwPolyline.Vertexes)
+                {
+                    polyline.Vertexes.Add(new LwPolylineVertex(new Vector2(vertex.Position.X + item.X, vertex.Position.Y + item.Y), vertex.Bulge));
+                }
+                
+                figura.entities.Add(polyline);
+            }
+
+            //AnalisarArcos(entities.OfType<Arc>());
+            List<Arc> arcs = figura.entities.OfType<Arc>().ToList();
+            foreach (var arc in arcs)
+            {
+                figura.entities.Remove(arc);
+                Arc arco = new Arc(new Vector2(arc.Center.X + item.X, arc.Center.X + item.X), arc.Radius, arc.StartAngle, arc.EndAngle);
+                figura.entities.Add(arco);
+            }
+
+            return figura;
         }
 
         private void PreencherAreaPosicionamento(ItemOrganizado item, ref Bitmap bitmapOcupacao)
@@ -108,13 +210,13 @@ namespace OrganizadorGeometrico.Model
             PosX = 0;
             PosY = 0;
 
-            for (int x = 0; x < PlacaGravacao.Altura; x++)
+            for (int x = 0; x < PlacaGravacao.Largura; x++)
             {
-                for (int y = 0; y < PlacaGravacao.Largura; y++)
+                for (int y = 0; y < PlacaGravacao.Altura; y++)
                 {
                     if (bitmapPlano.GetPixel(x, y).B == 255)
                     {
-                        if (AnalisaPixel(x, y, bitmapPlano, figura.Largura, figura.Altura))
+                        if (AnalisaPixel(x, y, bitmapPlano, figura.Largura + espacamentoX, figura.Altura + espacamentoY))
                         {
                             PosX = x;
                             PosY = y;
@@ -138,8 +240,9 @@ namespace OrganizadorGeometrico.Model
                         return false;
 
                     //Percorre cada pixel buscando por espacos nao ocupaveis
-                    if (bitmapPlano.GetPixel(PosX + x, PosY + y) == Color.Black)
+                    if (bitmapPlano.GetPixel(PosX + x, PosY + y).G == 0)
                         return false;
+
                 }
             }
 
