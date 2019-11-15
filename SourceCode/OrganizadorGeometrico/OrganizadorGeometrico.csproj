@@ -50,7 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\DXFCore.cs" />
     <Compile Include="Controller\DXFController.cs" />
     <Compile Include="Model\DXFExport.cs" />
     <Compile Include="Model\DXFItem.cs" />

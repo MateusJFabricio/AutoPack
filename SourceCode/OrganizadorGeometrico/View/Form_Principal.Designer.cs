@@ -566,7 +566,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form_Principal";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Organizador Automatico";
+            this.Text = "AutoPack - Organizador Automatico";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

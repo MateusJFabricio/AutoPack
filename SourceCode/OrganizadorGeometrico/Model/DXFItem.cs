@@ -453,7 +453,7 @@ namespace OrganizadorGeometrico.Model
                         }
                     }
                     if (!verticeEncontrado)
-                        throw new Exception("Par do vertice atual nao foi encontrado");
+                        throw new Exception("O plano de gravacao deve possuir apenas uma figura geometrica");
                 }
 
             } while (linhas.Count > 0);
@@ -607,6 +607,7 @@ namespace OrganizadorGeometrico.Model
                 //Verifica Max Y
                 VerificaMaxY(circulo.Center.Y + circulo.Radius);
             }
+
         }
 
         private void AnalisarArcos(IEnumerable<Arc> arcs)
