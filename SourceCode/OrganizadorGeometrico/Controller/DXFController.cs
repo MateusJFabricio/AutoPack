@@ -33,7 +33,7 @@ namespace OrganizadorGeometrico.Controller
                 mensagens.Enqueue(log);
             }
 
-            return organizador.BitmapResultado();
+            return organizador.GetBitmapResultado();
         }
 
         public Bitmap AdicionarPlacaGravacao(string path)
@@ -77,12 +77,7 @@ namespace OrganizadorGeometrico.Controller
             figuraGeometricaAtual = null;
         }
 
-        public bool ValidarArquivoDXF(string path)
-        {
-            return true;
-        }
-
-        internal Bitmap ResizeFiguraAtual(float zoom, float offsetX, float offsetY, int largura, int altura)
+        internal Bitmap RedimensionarFiguraAtual(float zoom, float offsetX, float offsetY, int largura, int altura)
         {
             if (figuraGeometricaAtual == null)
                 return new Bitmap(0, 0);
@@ -91,24 +86,24 @@ namespace OrganizadorGeometrico.Controller
             return figuraGeometricaAtual.GetBitmap();
         }
 
-        public void OrganizarFigurasArea()
+        public void OrdenarFigurasPorArea()
         {
-            figurasGeometricas = organizador.OrdenarPorArea(figurasGeometricas);
+            figurasGeometricas = organizador.OrganizarPorArea(figurasGeometricas);
         }
 
-        public void OrganizarFigurasAltura()
+        public void OrdenarFigurasPorAltura()
         {
-            figurasGeometricas = organizador.OrdenarPorAltura(figurasGeometricas);
+            figurasGeometricas = organizador.OrganizarPorAltura(figurasGeometricas);
         }
 
-        public void OrganizarFigurasLargura()
+        public void OrdenarFigurasPorLargura()
         {
-            figurasGeometricas = organizador.OrdenarPorLargura(figurasGeometricas);
+            figurasGeometricas = organizador.OrganizarPorLargura(figurasGeometricas);
         }
 
-        public void OrganizarFigurasOrdemCustomizada()
+        public void OrdenarFigurasPorOrdemCustomizada()
         {
-            figurasGeometricas = organizador.OrdenarCustomizado(figurasGeometricas);
+            figurasGeometricas = organizador.OrganizarCustomizado(figurasGeometricas);
         }
 
         internal Bitmap VisualizarFiguraGeometrica(int idFigura)
@@ -123,7 +118,7 @@ namespace OrganizadorGeometrico.Controller
             return figuraGeometricaAtual.GetBitmap();
         }
 
-        internal Bitmap VisualizarPlanoGeomtrico()
+        internal Bitmap VisualizarPlanoGeometrico()
         {
             figuraGeometricaAtual = placaGravacao;
             return figuraGeometricaAtual.GetBitmap();

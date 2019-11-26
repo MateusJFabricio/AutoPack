@@ -50,7 +50,7 @@ namespace OrganizadorGeometrico.Model
             progressoAlgoritmo++;
 
             //Remove figuras com area maior que a area do plano de gravacao
-            figurasGeometricas = RemoverFigurasIcompativeis(figurasGeometricas);
+            figurasGeometricas = RemoverFigurasAreaExcedente(figurasGeometricas);
 
             //Atualiza o progresso
             progressoAlgoritmo++;
@@ -71,7 +71,7 @@ namespace OrganizadorGeometrico.Model
             progressoAlgoritmo++;
 
             //Cria a posiciona cada entidade dentro do plano geometrico
-            PosicionarFiguras(itemOrganizados);
+            ReposicionarFiguraGeometrica(itemOrganizados);
 
             //Atualiza o progresso
             progressoAlgoritmo++;
@@ -85,7 +85,7 @@ namespace OrganizadorGeometrico.Model
 
         }
 
-        private void PosicionarFiguras(List<ItemOrganizado> itemOrganizados)
+        private void ReposicionarFiguraGeometrica(List<ItemOrganizado> itemOrganizados)
         {
             figurasPosicionadas = new DXFItem();
             figurasPosicionadas.entities = new netDxf.Collections.EntityCollection();
@@ -95,7 +95,7 @@ namespace OrganizadorGeometrico.Model
                 figurasPosicionadas.entities.AddRange(AtualizarPosicaoEntidades(item).entities);
                 sucessoOrganizador = true;
             }
-            figurasPosicionadas.RefreshInformacoes();
+            figurasPosicionadas.AtualizarInformacoes();
         }
 
         private void OrganizarFiguras(List<DXFItem> figuras)
@@ -178,7 +178,7 @@ namespace OrganizadorGeometrico.Model
                 figura.entities.Add(polyline);
             }
 
-            //AnalisarArcos(entities.OfType<Arc>());
+            //Arcos(entities.OfType<Arc>());
             List<Arc> arcs = figura.entities.OfType<Arc>().ToList();
             foreach (var arc in arcs)
             {
@@ -216,20 +216,21 @@ namespace OrganizadorGeometrico.Model
                 {
                     if (bitmapPlano.GetPixel(x, y).B == 255)
                     {
-                        if (AnalisaPixel(x, y, bitmapPlano, figura.Largura + espacamentoX, figura.Altura + espacamentoY))
+                        if (AnalisarPixel(x, y, bitmapPlano, figura.Largura + espacamentoX, figura.Altura + espacamentoY))
                         {
                             PosX = x;
                             PosY = y;
                             return true;
                         }
                     }
+                    
                 }
             }
 
             return false;
         }
 
-        private bool AnalisaPixel(int PosX, int PosY, Bitmap bitmapPlano, double largura, double altura)
+        private bool AnalisarPixel(int PosX, int PosY, Bitmap bitmapPlano, double largura, double altura)
         {
             for (int x = 0; x < largura; x++)
             {
@@ -249,7 +250,7 @@ namespace OrganizadorGeometrico.Model
             return true;
         }
 
-        private List<DXFItem> RemoverFigurasIcompativeis(List<DXFItem> figurasGeometricas)
+        private List<DXFItem> RemoverFigurasAreaExcedente(List<DXFItem> figurasGeometricas)
         {
             List<DXFItem> resultado = new List<DXFItem>();
 
@@ -276,7 +277,7 @@ namespace OrganizadorGeometrico.Model
                 return true;
         }
 
-        public List<DXFItem> OrdenarPorArea(List<DXFItem> figurasGeometricas)
+        public List<DXFItem> OrganizarPorArea(List<DXFItem> figurasGeometricas)
         {
             List<DXFItem> listResultado = new List<DXFItem>();
             DXFItem[] ordenacao = new DXFItem[figurasGeometricas.Count];
@@ -305,7 +306,7 @@ namespace OrganizadorGeometrico.Model
             return listResultado;
         }
 
-        public List<DXFItem> OrdenarPorAltura(List<DXFItem> figurasGeometricas)
+        public List<DXFItem> OrganizarPorAltura(List<DXFItem> figurasGeometricas)
         {
             List<DXFItem> listResultado = new List<DXFItem>();
             DXFItem[] ordenacao = new DXFItem[figurasGeometricas.Count];
@@ -334,7 +335,7 @@ namespace OrganizadorGeometrico.Model
             return listResultado;
         }
 
-        public List<DXFItem> OrdenarPorLargura(List<DXFItem> figurasGeometricas)
+        public List<DXFItem> OrganizarPorLargura(List<DXFItem> figurasGeometricas)
         {
             List<DXFItem> listResultado = new List<DXFItem>();
             DXFItem[] ordenacao = new DXFItem[figurasGeometricas.Count];
@@ -363,7 +364,7 @@ namespace OrganizadorGeometrico.Model
             return listResultado;
         }
 
-        public List<DXFItem> OrdenarCustomizado(List<DXFItem> figurasGeometricas)
+        public List<DXFItem> OrganizarCustomizado(List<DXFItem> figurasGeometricas)
         {
             List<DXFItem> listResultado = new List<DXFItem>();
             DXFItem[] ordenacao = new DXFItem[figurasGeometricas.Count];
@@ -410,7 +411,7 @@ namespace OrganizadorGeometrico.Model
             return vetor;
         }
 
-        public Bitmap BitmapResultado()
+        public Bitmap GetBitmapResultado()
         {
             if (itemOrganizados.Count > 0)
                 return figurasPosicionadas.GetBitmap();

@@ -35,7 +35,6 @@
             this.sairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ferramentasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.iniciarOrganizadorAutomaticoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.configuracoesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportarDXFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.creditosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -120,14 +119,14 @@
             // sairToolStripMenuItem
             // 
             this.sairToolStripMenuItem.Name = "sairToolStripMenuItem";
-            this.sairToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
+            this.sairToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sairToolStripMenuItem.Text = "Sair";
+            this.sairToolStripMenuItem.Click += new System.EventHandler(this.sairToolStripMenuItem_Click);
             // 
             // ferramentasToolStripMenuItem
             // 
             this.ferramentasToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.iniciarOrganizadorAutomaticoToolStripMenuItem,
-            this.configuracoesToolStripMenuItem,
             this.exportarDXFToolStripMenuItem});
             this.ferramentasToolStripMenuItem.Name = "ferramentasToolStripMenuItem";
             this.ferramentasToolStripMenuItem.Size = new System.Drawing.Size(84, 20);
@@ -139,12 +138,6 @@
             this.iniciarOrganizadorAutomaticoToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.iniciarOrganizadorAutomaticoToolStripMenuItem.Text = "Iniciar Organizador Automatico";
             this.iniciarOrganizadorAutomaticoToolStripMenuItem.Click += new System.EventHandler(this.IniciarOrganizadorAutomaticoToolStripMenuItem_Click);
-            // 
-            // configuracoesToolStripMenuItem
-            // 
-            this.configuracoesToolStripMenuItem.Name = "configuracoesToolStripMenuItem";
-            this.configuracoesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
-            this.configuracoesToolStripMenuItem.Text = "Configuracoes";
             // 
             // exportarDXFToolStripMenuItem
             // 
@@ -158,14 +151,16 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.creditosToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.helpToolStripMenuItem.Text = "Sobre";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // creditosToolStripMenuItem
             // 
             this.creditosToolStripMenuItem.Name = "creditosToolStripMenuItem";
-            this.creditosToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.creditosToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.creditosToolStripMenuItem.Text = "Creditos";
+            this.creditosToolStripMenuItem.Click += new System.EventHandler(this.creditosToolStripMenuItem_Click);
             // 
             // splitContainer1
             // 
@@ -599,7 +594,6 @@
         private System.Windows.Forms.ToolStripMenuItem sairToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ferramentasToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iniciarOrganizadorAutomaticoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem configuracoesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem creditosToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer1;

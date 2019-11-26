@@ -2,7 +2,6 @@
 using netDxf.Blocks;
 using netDxf.Collections;
 using netDxf.Entities;
-using netDxf.Objects;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -24,10 +23,7 @@ namespace OrganizadorGeometrico.Model
         DxfDocument docFigura;
         public string path;
         public string nome;
-        PlotPaperUnits unidadeMedida;
-        public int[,] matrizOcupacao;
         public EntityCollection entities;
-
         public int Ordem = 0;
 
         public void InicializarDeArquivo(string path, int id, bool placaGravacao = false)
@@ -50,7 +46,7 @@ namespace OrganizadorGeometrico.Model
             //    IdentificacaoRegioesFigura();
         }
 
-        public void RefreshInformacoes()
+        public void AtualizarInformacoes()
         {
             if (entities.Count > 0)
             {
@@ -62,174 +58,12 @@ namespace OrganizadorGeometrico.Model
                 GerarBitmapInicial(false);
             }
         }
-        private void IdentificacaoRegioesFigura()
-        {
-            matrizOcupacao = new int[(int) Largura, (int) Altura];
-            int linha = matrizOcupacao.GetLength(0);
-            int coluna = matrizOcupacao.GetLength(1);
-
-            //Preenche a matriz de ocupacao de acordo com os pixels desenhados em tela
-            for (int i = 0; i < linha; i++)
-            {
-                for (int j = 0; j < coluna; j++)
-                {
-                    matrizOcupacao[i, j] = Convert.ToInt32(bitmap.GetPixel(i, j).R) == 0 ? 0 : 1;
-                }
-            }
-
-            int qntRegioes = IdentificarRegioes(matrizOcupacao);
-
-            if (qntRegioes > 1)
-            {
-                qntRegioes = 0;
-            }
-        }
-
-        //Identifica a quantidade de regioes da figura
-        //Retorna a quantidade de regioes
-        private int IdentificarRegioes(int[,] matrizOcupacao)
-        {
-            bool pixelLivre = true;
-            int idRegiao = 0;
-
-
-            //matrizOcupacao = new int[,]{
-            //    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            //    {0, 0, 0, 1, 1, 1, 1, 1, 1, 0},
-            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
-            //    {0, 1, 0, 0, 0, 0, 0, 0, 1, 0},
-            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
-            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
-            //    {0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
-            //    {0, 0, 0, 1, 1, 1, 1, 1, 1, 0},
-            //    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-            //};
-
-            int[,] matrizRegioes = new int[matrizOcupacao.GetLength(0), matrizOcupacao.GetLength(1)];
-
-            //Inicia a verificacao das regioes
-            do
-            {
-                //Adiciona a semente
-                Vector2 semente = RetornarPixelVazio(matrizOcupacao, matrizRegioes);
-                pixelLivre = semente.X != -1;
-
-                if (pixelLivre)
-                {
-                    idRegiao++;
-                    VerificarPixelRegiao(semente, matrizOcupacao, idRegiao, ref matrizRegioes);
-                }
-            }
-            while (pixelLivre);
-                
-            return idRegiao;
-        }
-
-        private Vector2 RetornarPixelVazio(int[,] matrizOcupacao, int[,] matrizRegioes)
-        {
-            for (int i = 0; i < matrizOcupacao.GetLength(0) - 1; i++)
-            {
-                for (int j = 0; j < matrizOcupacao.GetLength(1) - 1; j++)
-                {
-                    if (matrizOcupacao[i, j] == 0 && matrizRegioes[i, j] == 0)
-                        return new Vector2(i, j);
-                }
-            }
-
-            return new Vector2(-1, -1);
-        }
-
-        //Crescimento de regiao
-        private void VerificarPixelRegiao(Vector2 semente, int[,] matrizOcupacao, int idRegiao, ref int[,] matrizRegioes)
-        {
-            Queue<Vector2> coordenadas = new Queue<Vector2>();
-            coordenadas.Enqueue(semente);
-            while(coordenadas.Count > 0)
-            {
-                Vector2 coordenada = coordenadas.Dequeue();
-
-                //Verifica a posicao atual
-                if (matrizOcupacao[(int)coordenada.X, (int)coordenada.Y] == 0)
-                {
-                    if (matrizRegioes[(int)coordenada.X, (int)coordenada.Y] == 0)
-                        matrizRegioes[(int)coordenada.X, (int)coordenada.Y] = idRegiao;
-                }
-
-                //Verifica a direita
-                if (coordenada.X + 1 <= matrizOcupacao.GetLength(0) - 1)
-                {
-                    if (matrizOcupacao[(int)coordenada.X + 1, (int)coordenada.Y] == 0)
-                    {
-                        if (matrizRegioes[(int)coordenada.X + 1, (int)coordenada.Y] == 0)
-                        {
-                            matrizRegioes[(int)coordenada.X + 1, (int)coordenada.Y] = idRegiao;
-                            coordenadas.Enqueue(new Vector2(coordenada.X + 1, coordenada.Y));
-                        }
-                    }
-                }
-
-                //Verifica a esquerda
-                if (coordenada.X - 1 >= 0)
-                {
-                    if (matrizOcupacao[(int)coordenada.X - 1, (int)coordenada.Y] == 0)
-                    {
-                        if (matrizRegioes[(int)coordenada.X - 1, (int)coordenada.Y] == 0)
-                        {
-                            matrizRegioes[(int)coordenada.X - 1, (int)coordenada.Y] = idRegiao;
-                            coordenadas.Enqueue(new Vector2(coordenada.X - 1, coordenada.Y));
-                        }
-                    }
-                }
-
-                //Verifica embaixo
-                if (coordenada.Y + 1 <= matrizOcupacao.GetLength(1) - 1)
-                {
-                    if (matrizOcupacao[(int)coordenada.X, (int)coordenada.Y + 1] == 0)
-                    {
-                        if (matrizRegioes[(int)coordenada.X, (int)coordenada.Y + 1] == 0)
-                        {
-                            matrizRegioes[(int)coordenada.X, (int)coordenada.Y + 1] = idRegiao;
-                            coordenadas.Enqueue(new Vector2(coordenada.X, coordenada.Y + 1));
-                        }
-                    }
-                }
-
-                //Verifica em cima
-                if (coordenada.Y - 1 >= 0)
-                {
-                    if (matrizOcupacao[(int)coordenada.X, (int)coordenada.Y - 1] == 0)
-                    {
-                        if (matrizRegioes[(int)coordenada.X, (int)coordenada.Y - 1] == 0)
-                        {
-                            matrizRegioes[(int)coordenada.X, (int)coordenada.Y - 1] = idRegiao;
-                            coordenadas.Enqueue(new Vector2(coordenada.X, coordenada.Y - 1));
-                        }
-                    }
-                }
-            }
-        }
-
-        public Bitmap MatrizOcupacao_Bitmap(int[,] matriz)
-        {
-            Bitmap bit = new Bitmap(matriz.GetLength(0), matriz.GetLength(1));
-            for (int i = 0; i < matriz.GetLength(0); i++)
-            {
-                for (int j = 0; j < matriz.GetLength(1); j++)
-                {
-                    if (matriz[i, j] != 0)
-                        bit.SetPixel(i, j, Color.Black);
-                }
-            }
-            return bit;
-        }
 
         private void BuscarAquivo()
         {
             docFigura = DxfDocument.Load(path);
             nome = docFigura.Name;
             entities = docFigura.Blocks[Block.DefaultModelSpaceName].Entities;
-            
-            //unidadeMedida = docFigura.Layouts["Layout1"].PlotSettings.PaperUnits;
         }
 
         private void GerarBitmapInicial(bool preencher)
@@ -243,7 +77,7 @@ namespace OrganizadorGeometrico.Model
                 throw new Exception("Nao ha figura geometrica neste arquivo!");
 
 
-            //Pegar a dimensao dos circulos
+            //Buscar a dimensao dos circulos
             AnalisarCirculos(entities.OfType<Circle>());
 
             AnalisarLinhas(entities.OfType<Line>());

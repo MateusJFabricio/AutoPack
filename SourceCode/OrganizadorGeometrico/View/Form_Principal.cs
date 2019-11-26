@@ -144,10 +144,7 @@ namespace OrganizadorGeometrico
             {
                 foreach (var arquivo in openFile.FileNames)
                 {
-                    if (control.ValidarArquivoDXF(openFile.FileName))
-                        arquivosValidos.Add(arquivo);
-                    else
-                        arquivosInvalidos.Add(NomeArquivo(arquivo));
+                    arquivosValidos.Add(arquivo);
                 }
             }
 
@@ -198,18 +195,22 @@ namespace OrganizadorGeometrico
 
             try
             {
+                //Inicializa variaveis
                 figurasOrganizadas = false;
                 rtResultados.Clear();
                 stopwatch.Start();
                 timerProgressbar.Start();
 
+                //Executa o algoritmo
                 Bitmap bm = control.IniciarOrganizador();
                 pbVisaoGrafica.BackgroundImage = bm;
                 pbVisaoGrafica.Refresh();
 
+                //Atribui os resultados
                 figurasOrganizadas = control.FigurasOrganizadas;
                 stopwatch.Stop();
                 rtResultados.AppendText($"Tempo total de execucao do algoritmo: {stopwatch.Elapsed.TotalSeconds} segundos" + Environment.NewLine);
+
             } catch (Exception ex)
             {
                 figurasOrganizadas = false;
@@ -262,7 +263,7 @@ namespace OrganizadorGeometrico
 
         private void btnVisualizarPlanoGeometrico_Click(object sender, EventArgs e)
         {
-            Bitmap bitmap = control.VisualizarPlanoGeomtrico();
+            Bitmap bitmap = control.VisualizarPlanoGeometrico();
             pbVisaoGrafica.BackgroundImage = bitmap;
             pbVisaoGrafica.Refresh();
 
@@ -277,19 +278,19 @@ namespace OrganizadorGeometrico
         {
             if (rbArea.Checked)
             {
-                control.OrganizarFigurasArea();
+                control.OrdenarFigurasPorArea();
             }
             else if (rbAltura.Checked)
             {
-                control.OrganizarFigurasAltura();
+                control.OrdenarFigurasPorAltura();
             }
             else if (rbLargura.Checked)
             {
-                control.OrganizarFigurasLargura();
+                control.OrdenarFigurasPorLargura();
             }
             else if (rbCustomizada.Checked)
             {
-                control.OrganizarFigurasOrdemCustomizada();
+                control.OrdenarFigurasPorOrdemCustomizada();
             }
             else
             {
@@ -390,6 +391,29 @@ namespace OrganizadorGeometrico
             }
         }
 
+        private void creditosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rtResultados.Clear();
+            rtResultados.AppendText("\t\t\tEstagio Supervisionado II");
+            rtResultados.AppendText(Environment.NewLine);
+            rtResultados.AppendText("Software desenvolvido por Mateus Fabricio com orientacao da Dra. Caroline Mendes");
+            rtResultados.AppendText(Environment.NewLine);
+            rtResultados.AppendText("\tCiencia da Computacao - Centro Universitario Campo de Andrade");
+            rtResultados.AppendText(Environment.NewLine);
+            rtResultados.AppendText("\t\t\tCuritiba - PR - 2019");
+
+        }
+
+        private void sairToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void pbVisaoGrafica_MouseDown(object sender, MouseEventArgs e)
         {
             transformarFigura = true;
@@ -432,7 +456,7 @@ namespace OrganizadorGeometrico
                 mousePosX = e.X;
                 mousePosY = e.Y;
 
-                Bitmap bm = control.ResizeFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
+                Bitmap bm = control.RedimensionarFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
                 pbVisaoGrafica.BackgroundImage = bm;
                 pbVisaoGrafica.Refresh();
             }
