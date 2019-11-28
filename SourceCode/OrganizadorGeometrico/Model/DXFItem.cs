@@ -26,6 +26,34 @@ namespace OrganizadorGeometrico.Model
         public EntityCollection entities;
         public int Ordem = 0;
 
+        public DXFItem()
+        {
+
+        }
+
+        //Clonar objeto
+        public DXFItem(DXFItem item)
+        {
+            this.figuraFechada  = item.figuraFechada;
+            this.id             = item.id;
+            this.bitmap         = item.bitmap;
+            this.desenhador     = item.desenhador;
+            this.Altura         = item.Altura;
+            this.Largura        = item.Largura;
+            this.Area           = item.Area;
+            this.menorX         = item.menorX;
+            this.menorY         = item.menorY;
+            this.maiorX         = item.maiorX;
+            this.maiorY         = item.maiorY;
+            this.Origem         = item.Origem;
+            this.docFigura      = item.docFigura;
+            this.path           = item.path;
+            this.nome           = item.nome;
+            this.entities       = new EntityCollection();
+            this.entities.AddRange(item.entities);
+            this.Ordem          = item.Ordem;
+    }
+
         public void InicializarDeArquivo(string path, int id, bool placaGravacao = false)
         {
             this.path = path;
@@ -132,6 +160,7 @@ namespace OrganizadorGeometrico.Model
 
             DesenharArcos(entities.OfType<Arc>(), zoom, (float)alturaBitmap + (float)Origem[1] * 2, corLinha, preencherFigura);
 
+            desenhador.Dispose();
         }
 
         #region Ferramentas de desenho

@@ -16,8 +16,9 @@ namespace OrganizadorGeometrico.Model
 
         public ItemOrganizado(DXFItem figura)
         {
-            Figura = figura;
+            Figura = new DXFItem(figura);
         }
+
     }
 
     class Organizer
@@ -92,7 +93,9 @@ namespace OrganizadorGeometrico.Model
             figurasPosicionadas.entities.AddRange(PlacaGravacao.entities);
             foreach (var item in itemOrganizados)
             {
-                figurasPosicionadas.entities.AddRange(AtualizarPosicaoEntidades(item).entities);
+                ItemOrganizado itemPosicionar = item;
+                DXFItem itemPosicionado = AtualizarPosicaoEntidades(itemPosicionar);
+                figurasPosicionadas.entities.AddRange(itemPosicionado.entities);
                 sucessoOrganizador = true;
             }
             figurasPosicionadas.AtualizarInformacoes();
