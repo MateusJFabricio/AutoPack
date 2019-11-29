@@ -49,9 +49,7 @@ namespace OrganizadorGeometrico
                     txtNomePlacaGravacao.Text = nomeComExtensao.Substring(0, nomeComExtensao.ToUpper().IndexOf(".DXF"));
 
                     //Cria o objeto DXF e carrega o bitmap
-                    Bitmap bm = control.AdicionarPlacaGravacao(diretorioPlacaGravacao);
-                    pbVisaoGrafica.BackgroundImage = bm;
-                    pbVisaoGrafica.Refresh();
+                    control.AdicionarPlacaGravacao(diretorioPlacaGravacao);
 
                     //Carrega as informacoes do objeto
                     lblInformacaoPlanoGeometrico.Text = "Area: " + control.figuraGeometricaAtual.Area + " mm2 ";
@@ -68,9 +66,9 @@ namespace OrganizadorGeometrico
                     offsetX = 0f;
                     offsetY = 0f;
 
-                    //Bitmap bm = control.ResizeFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
-                    //pbVisaoGrafica.BackgroundImage = bm;
-                    //pbVisaoGrafica.Refresh();
+                    Bitmap bm = control.RedimensionarFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
+                    pbVisaoGrafica.BackgroundImage = bm;
+                    pbVisaoGrafica.Refresh();
 
                 }
                 catch (Exception ex)
@@ -109,7 +107,7 @@ namespace OrganizadorGeometrico
 
                 AdicionarFiguraDataGridView(control.figuraGeometricaAtual);
 
-                //control.ResizeFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
+                control.RedimensionarFiguraAtual(zoom, offsetX, offsetY, pbVisaoGrafica.Width, pbVisaoGrafica.Height);
             }
             progressBar.Value = 0;
             zoom = 1f;

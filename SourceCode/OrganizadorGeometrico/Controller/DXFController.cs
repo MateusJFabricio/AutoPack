@@ -39,7 +39,7 @@ namespace OrganizadorGeometrico.Controller
         public Bitmap AdicionarPlacaGravacao(string path)
         {
             placaGravacao = new DXFItem();
-            placaGravacao.InicializarDeArquivo(path, 0, true);
+            placaGravacao.InicializarDeArquivo(path, 0, false);
 
             //Valida se a figura geometrica esta aberta
             if (!placaGravacao.figuraFechada)
