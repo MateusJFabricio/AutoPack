@@ -119,7 +119,7 @@
             // sairToolStripMenuItem
             // 
             this.sairToolStripMenuItem.Name = "sairToolStripMenuItem";
-            this.sairToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sairToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
             this.sairToolStripMenuItem.Text = "Sair";
             this.sairToolStripMenuItem.Click += new System.EventHandler(this.sairToolStripMenuItem_Click);
             // 
@@ -158,7 +158,7 @@
             // creditosToolStripMenuItem
             // 
             this.creditosToolStripMenuItem.Name = "creditosToolStripMenuItem";
-            this.creditosToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.creditosToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.creditosToolStripMenuItem.Text = "Creditos";
             this.creditosToolStripMenuItem.Click += new System.EventHandler(this.creditosToolStripMenuItem_Click);
             // 
@@ -199,6 +199,7 @@
             // dgvArquivos
             // 
             this.dgvArquivos.AllowUserToAddRows = false;
+            this.dgvArquivos.AllowUserToDeleteRows = false;
             this.dgvArquivos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvArquivos.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Id,
