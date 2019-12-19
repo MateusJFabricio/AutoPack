@@ -191,8 +191,8 @@ namespace OrganizadorGeometrico
                 return;
             }
 
-            try
-            {
+            //try
+            //{
                 //Inicializa variaveis
                 figurasOrganizadas = false;
                 rtResultados.Clear();
@@ -209,13 +209,13 @@ namespace OrganizadorGeometrico
                 stopwatch.Stop();
                 rtResultados.AppendText($"Tempo total de execucao do algoritmo: {stopwatch.Elapsed.TotalSeconds} segundos" + Environment.NewLine);
 
-            } catch (Exception ex)
-            {
-                figurasOrganizadas = false;
-                timerProgressbar.Stop();
-                stopwatch.Stop();
-                MessageBox.Show(ex.Message);
-            }
+            //} catch (Exception ex)
+            //{
+            //    figurasOrganizadas = false;
+            //    timerProgressbar.Stop();
+            //    stopwatch.Stop();
+            //    MessageBox.Show(ex.Message);
+            //}
         }
 
         private void btnMover_Click(object sender, EventArgs e)

@@ -45,7 +45,7 @@ namespace OrganizadorGeometrico.Model
             this.FigurasGeometricas = figurasGeometricas;
 
             //Atualiza o plano de gravacao para o tamanho original
-            PlacaGravacao.GerarBitmap(1, 0, 0, (int)PlacaGravacao.Largura + 1, (int)PlacaGravacao.Altura + 1, Color.Black, Color.White, true);
+            PlacaGravacao.GerarBitmap(1, 0, 0, (int)PlacaGravacao.Largura, (int)PlacaGravacao.Altura, Color.Black, Color.White, true);
 
             //Atualiza o progresso
             progressoAlgoritmo++;
@@ -203,7 +203,7 @@ namespace OrganizadorGeometrico.Model
             {
                 for (int y = item.Y; y < item.Y + altura; y++)
                 {
-                    bitmapOcupacao.SetPixel(x, y, Color.Red);
+                    bitmapOcupacao.SetPixel(x, (int)PlacaGravacao.Altura - y - 1, Color.Red);
                 }
             }
         }
@@ -217,7 +217,7 @@ namespace OrganizadorGeometrico.Model
             {
                 for (int y = 0; y < PlacaGravacao.Altura; y++)
                 {
-                    if (bitmapPlano.GetPixel(x, y).B == 255)
+                    if (bitmapPlano.GetPixel(x, (int)PlacaGravacao.Altura - y - 1).B == 255)
                     {
                         if (AnalisarPixel(x, y, bitmapPlano, figura.Largura + espacamentoX, figura.Altura + espacamentoY))
                         {
@@ -240,11 +240,11 @@ namespace OrganizadorGeometrico.Model
                 for (int y = 0; y < altura; y++)
                 {
                     //Excede o limite do bitmap
-                    if (x + PosX > bitmapPlano.Width || y + PosY > bitmapPlano.Height)
+                    if (x + PosX > bitmapPlano.Width - 1 || y + PosY > bitmapPlano.Height - 1)
                         return false;
 
                     //Percorre cada pixel buscando por espacos nao ocupaveis
-                    if (bitmapPlano.GetPixel(PosX + x, PosY + y).G == 0)
+                    if (bitmapPlano.GetPixel(PosX + x, bitmapPlano.Height - PosY - y - 1).G == 0)
                         return false;
 
                 }

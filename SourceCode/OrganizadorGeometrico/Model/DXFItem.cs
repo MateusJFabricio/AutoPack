@@ -139,7 +139,7 @@ namespace OrganizadorGeometrico.Model
             if (zoom <= 0)
                 zoom = 0f;
 
-            bitmap = new Bitmap(larguraBitmap + 10, alturaBitmap + 10);
+            bitmap = new Bitmap(larguraBitmap, alturaBitmap);
 
 
             desenhador = Graphics.FromImage(bitmap);
